@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:gravity="center_horizontal"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/tv_AirplaneMode"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:text="@string/_1" />
+
+    <Button
+        android:id="@+id/btn_sendMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:onClick="sendMessage"
+        android:text="@string/_2" />
+
+    <Button
+        android:id="@+id/btn_sendLocalMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:onClick="sendMessageLocal"
+        android:text="@string/_3" />
+
+    <TextView
+        android:id="@+id/tv_TimeZone"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:text="4)Изменить часовой пояс для отображения уведомления(работает вне приложения)" />
+
+</LinearLayout>

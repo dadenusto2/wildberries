@@ -15,18 +15,12 @@ class ReceiverExampleActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         setContentView(R.layout.receiver_example_activity)
-    }
-    override fun onDestroy() {
-        super.onDestroy()
-        //unregisterReceiver(br)
-        unregisterReceiver(brAirplane)
     }
 
     override fun onPause() {
         super.onPause()
-        //unregisterReceiver(br)
+        unregisterReceiver(brMessage)
         unregisterReceiver(brAirplane)
     }
 
@@ -46,6 +40,7 @@ class ReceiverExampleActivity : AppCompatActivity() {
         ifilter2.addAction("sendMessage")
         localBroadcastManager.registerReceiver(brMessage, ifilter2)
     }
+
     fun sendMessage(view: View) {
         Intent().also { intent ->
             intent.action = "sendMessage"

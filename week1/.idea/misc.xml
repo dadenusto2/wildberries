@@ -3,6 +3,11 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/kgeny/Desktop/WB/week1/app/src/main/res/layout/activity_main.xml" value="0.2595108695652174" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week1/app/src/main/res/layout/contact_adapter.xml" value="0.2595108695652174" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week1/app/src/main/res/layout/content_example_activity.xml" value="0.22780797101449277" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week1/app/src/main/res/layout/receiver_example_activity.xml" value="0.2595108695652174" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week1/app/src/main/res/layout/service_example_activity.xml" value="0.26773049645390073" />
         <entry key="..\:/Users/kgeny/Desktop/WB/week12/app/src/main/res/layout/activity_main.xml" value="0.2608915906788247" />
         <entry key="..\:/Users/kgeny/Desktop/WB/week12/app/src/main/res/layout/receiver_example_activity.xml" value="0.22" />
       </map>

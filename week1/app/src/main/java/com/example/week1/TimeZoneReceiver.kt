@@ -9,7 +9,7 @@ import android.widget.Toast
 import java.util.*
 
 
-class BluetoothReceiver : BroadcastReceiver() {
+class TimeZoneReceiver : BroadcastReceiver() {
     override fun onReceive(context: Context, intent: Intent) {
         val pm : PackageManager = context.packageManager
         val action = intent.action

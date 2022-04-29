@@ -1,11 +1,12 @@
 package com.example.week1
 
+import android.content.ContentProvider
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Button
-import android.widget.TextView
+import java.security.Provider
 
 class MainActivity : AppCompatActivity() {
     lateinit var btn_Receiver: Button
@@ -23,5 +24,13 @@ class MainActivity : AppCompatActivity() {
                 startActivity(intent)
             }
         }
+    }
+    fun ContentProvider(view: View){
+        val intent = Intent(this, ContentExampleActivity::class.java)
+        startActivity(intent)
+    }
+    fun Service(view: View){
+        val intent = Intent(this, ServiceExampleActivity::class.java)
+        startActivity(intent)
     }
 }

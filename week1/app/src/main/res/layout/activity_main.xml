@@ -15,15 +15,16 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="Broadcast receivers" />
+        android:text="@string/broadcast_receivers" />
 
     <Button
-        android:id="@+id/btn_providers"
+        android:id="@+id/btn_Providers"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="Content providers" />
+        android:onClick="ContentProvider"
+        android:text="@string/content_providers" />
 
     <Button
         android:id="@+id/btn_Services"
@@ -31,6 +32,7 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="Services" />
+        android:onClick="Service"
+        android:text="@string/services" />
 
 </LinearLayout>

@@ -3,7 +3,10 @@
     xmlns:tools="http://schemas.android.com/tools"
     package="com.example.week1">
 
-    <uses-permission android:name="android.permission.BLUETOOTH_CONNECT" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <uses-permission android:name="android.permission.VIBRATE" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -11,6 +14,15 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Week1">
+        <service
+            android:name=".ServiceVibrator"
+            android:enabled="true"
+            android:exported="true"></service>
+        <service
+            android:name=".ServiceMusic"
+            android:enabled="true"
+            android:exported="true" />
+
         <activity
             android:name=".MainActivity"
             android:enabled="true"
@@ -29,8 +41,16 @@
                 <action android:name="ACTION_AIRPLANE_MODE_CHANGED" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".ContentExampleActivity"
+            android:exported="true"
+            tools:ignore="ExtraText" />
+        <activity
+            android:name=".ServiceExampleActivity"
+            android:exported="true" />
+
         <receiver
-            android:name=".BluetoothReceiver"
+            android:name=".TimeZoneReceiver"
             android:enabled="true"
             android:exported="true">
             <intent-filter>

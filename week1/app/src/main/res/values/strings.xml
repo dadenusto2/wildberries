@@ -5,4 +5,7 @@
     <string name="_1">1)Включите/выключите режим в самолете для демонстрации приема сообщений от систнемы</string>
     <string name="_2">2)Отправить сообщение</string>
     <string name="_3">3)Отправить сообщение локально</string>
+    <string name="services">Services</string>
+    <string name="content_providers">Content providers</string>
+    <string name="broadcast_receivers">Broadcast receivers</string>
 </resources>

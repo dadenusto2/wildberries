@@ -29,7 +29,6 @@ class AirplaneReceiver : BroadcastReceiver()  {
             alertDialog.show()
         } else {
             intent.getAction().equals(Intent.ACTION_POWER_DISCONNECTED)
-
             Toast.makeText(context, "Устройство не в режиме самолета", Toast.LENGTH_SHORT).show()
         }
     }

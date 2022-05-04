@@ -19,6 +19,8 @@ import com.example.week1.Content.DBHelper
 
 // Используется для предоставления доступа к хранилищу данных приложения другим приложениям.
 // Пример использования в приложениях: Приложения для контактов, приложения настроек телефона
+// пример
+// Список контактов(не из контактов телефона), вставка, удаление всех контактов
 class ContentExampleActivity : AppCompatActivity(),
     LoaderManager.LoaderCallbacks<Cursor> {// для асинхронной загрузки
         private lateinit var cursorAdapter: ContactsAdapter // адаптер для списка контактов

@@ -12,6 +12,10 @@ import com.example.week1.Services.ServiceVibrator
 // Service используется для исполнения долгих операций, которые работают в фоновом режиме
 // Например, музыкальные плееры
 // Пример использования в приложениях: Яндекс.Музыка
+/// пример 1
+// Включение музыки, будет играть пока не остановится сервис нажатием кнопки,работает вне данной активности
+// пример 2
+// Включение вибрации, будет играть пока находимся на текущем экране
 class ServiceExampleActivity : AppCompatActivity() {
     var serviceMusic= ServiceMusic::class.java // переменная сервиса музыки
     lateinit var intentMusic : Intent
@@ -34,8 +38,8 @@ class ServiceExampleActivity : AppCompatActivity() {
 
         intentVibrator = Intent(this, serviceVibrator)
 
-        musicButton = findViewById<Button>(R.id.btnServiceMusic)
-        vibratorButton = findViewById<Button>(R.id.btnServiceVibro)
+        musicButton = findViewById<Button>(R.id.btn_serviceMusic)
+        vibratorButton = findViewById<Button>(R.id.btn_serviceVibro)
 
         if (isServiceRunning(serviceMusic)) { // состояние сервиса для текста на кнопке
             musicButton.text = getString(R.string.stop_music)
@@ -73,7 +77,7 @@ class ServiceExampleActivity : AppCompatActivity() {
         }
         return false
     }
-    override fun onPause() {// при остановке останавилваем сервис вибрации, сервис музыка останется в текущем состоянии
+    override fun onPause() {// при остановке останавилваем сервис вибрации, сервис музыки останется в текущем состоянии
         super.onPause()
         if (isServiceRunning(serviceVibrator)) {
             stopService(intentVibrator)

@@ -13,7 +13,8 @@
         android:autofillHints=""
         android:hint="@string/enter_name"
         android:inputType="text"
-        android:minHeight="48dp" />
+        android:minHeight="48dp"
+        android:textColorHint="#757575" />
 
     <EditText
         android:id="@+id/et_number"

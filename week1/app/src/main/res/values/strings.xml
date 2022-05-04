@@ -16,4 +16,9 @@
     <string name="start_music">Запустить музыку</string>
     <string name="stop_vibro">Остановить вибрацию</string>
     <string name="stop_music">Остановить музыку</string>
+    <string name="content_provider">Пример работы Content provider</string>
+    <string name="add_Contact">Добавить контакт</string>
+    <string name="del_contact">Удалить все контакты</string>
+    <string name="_4">4)Изменить часовой пояс для отображения уведомления(работает вне приложения)</string>
+    <string name="service">Пример работы Service</string>
 </resources>

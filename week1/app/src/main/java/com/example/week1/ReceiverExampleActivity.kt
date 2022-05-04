@@ -13,6 +13,14 @@ import com.example.week1.Receivers.MessageReceiver
 // Предназначен для получения различных сообщений от системы или других приложений
 // Например, может применятся в приложениях, требющих постоянное подключение к интернету
 // Пример использования в приложениях: Chrome, яндекс.клавиатура, различные лаунчеры
+// пример 1
+// При включени режима в самолете появлется AlertDialog с предложением выключить его через настройки(получение сообщений)
+// пример 2
+// Отправка соообщений всей системе по нажатию кнопки
+// пример 3
+// Отправка соообщений всей локально(лучше для защиты данных)
+// пример 4
+// Получение сообщений через объявленый в манифесте Receiver() при изменении часового пояса
 class ReceiverExampleActivity : AppCompatActivity() {
     lateinit var brMessage: MessageReceiver // receiver для прослушивания сообщений
     lateinit var brAirplane: AirplaneReceiver // receiver для обнаружения включения режима в самолете
@@ -21,14 +29,6 @@ class ReceiverExampleActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.receiver_example_activity)
-    }
-
-    override fun onPause() {
-        super.onPause()
-        // снимаем регестрацию
-        unregisterReceiver(brMessage)
-        unregisterReceiver(brAirplane)
-        localBroadcastManager.unregisterReceiver(brMessage)
     }
 
     override fun onResume() {
@@ -49,6 +49,14 @@ class ReceiverExampleActivity : AppCompatActivity() {
         val ifilterLocalBroadcastManager = IntentFilter()
         ifilterLocalBroadcastManager.addAction("sendMessageLocal")
         localBroadcastManager.registerReceiver(brMessage, ifilterLocalBroadcastManager)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // снимаем регестрацию
+        unregisterReceiver(brMessage)
+        unregisterReceiver(brAirplane)
+        localBroadcastManager.unregisterReceiver(brMessage)
     }
 
     fun sendMessage(view: View) {// отправка сообщения системе

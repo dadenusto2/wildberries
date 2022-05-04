@@ -6,8 +6,17 @@
     android:gravity="center"
     android:orientation="vertical">
 
+    <TextView
+        android:id="@+id/textView6"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="8dp"
+        android:layout_weight="1"
+        android:gravity="center_horizontal"
+        android:text="@string/service" />
+
     <Button
-        android:id="@+id/btnServiceMusic"
+        android:id="@+id/btn_serviceMusic"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
@@ -15,7 +24,7 @@
         android:text="@string/start_music" />
 
     <Button
-        android:id="@+id/btnServiceVibro"
+        android:id="@+id/btn_serviceVibro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"

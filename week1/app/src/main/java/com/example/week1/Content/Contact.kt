@@ -1,5 +1,6 @@
-package com.example.week1
+package com.example.week1.Content
 
+// Класс контакта, содержащий имя и номер
 class Contact {
     var name : String
     var number : String
@@ -10,5 +11,15 @@ class Contact {
 
     override fun toString(): String {
         return "Contact(name='$name', number='$number')"
+    }
+
+    @JvmName("getName1")
+    fun getName(): String {
+        return name
+    }
+
+    @JvmName("getNumber1")
+    fun getNumber(): String {
+        return number
     }
 }

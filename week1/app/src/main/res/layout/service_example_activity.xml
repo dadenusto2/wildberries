@@ -12,14 +12,14 @@
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="Запустить музыку" />
+        android:text="@string/start_music" />
 
     <Button
-        android:id="@+id/btnServiceStop"
+        android:id="@+id/btnServiceVibro"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
-        android:text="Остановка Службы" />
+        android:text="@string/start_vibro" />
 
 </LinearLayout>

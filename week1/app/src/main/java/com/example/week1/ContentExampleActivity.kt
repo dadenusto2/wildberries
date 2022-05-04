@@ -1,74 +1,142 @@
 package com.example.week1
 
 import android.annotation.SuppressLint
+import android.content.ContentValues
 import android.database.Cursor
-import android.net.Uri
 import android.os.Bundle
-import android.provider.ContactsContract
-import android.provider.ContactsContract.CommonDataKinds.Phone
-import android.util.Log
-import android.widget.ListView
-import android.widget.Toast
+import android.text.Editable
+import android.view.LayoutInflater
+import android.view.View
+import android.widget.*
 import androidx.appcompat.app.AppCompatActivity
+import androidx.loader.app.LoaderManager
+import androidx.loader.content.CursorLoader
+import androidx.loader.content.Loader
+import com.example.week1.Content.Contact
+import com.example.week1.Content.ContactProvider
+import com.example.week1.Content.ContactsAdapter
+import com.example.week1.Content.DBHelper
 
-
-class ContentExampleActivity : AppCompatActivity() {
-
-    private lateinit var contact_listview: ListView
-    private val colummns = arrayOf(
-        ContactsContract.Contacts._ID,
-        ContactsContract.Contacts.DISPLAY_NAME,
-        ContactsContract.Contacts.HAS_PHONE_NUMBER
-    )
-    var arrayList = ArrayList<Contact>()
-    lateinit var adapter: ContactAdapter
-    private lateinit var cursor: Cursor
-    lateinit var listview : ListView
-
-    private val contactsListUri: Uri = ContactsContract.Contacts.CONTENT_URI
-    private val phoneUri: Uri = ContactsContract.CommonDataKinds.Phone.CONTENT_URI
-    private val contactIdUri = ContactsContract.CommonDataKinds.Phone.CONTACT_ID
-    private val numberUri = ContactsContract.CommonDataKinds.Phone.NUMBER
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.content_example_activity)
-        cursor = contentResolver.query(contactsListUri, null, null, null, null)!!
-        readContacts()
-    }
-
-    @SuppressLint("Range", "Recycle")
-    fun readContacts() = if (cursor.count == 0) {
-        Toast.makeText(applicationContext, "No Contacts in Your Directory", Toast.LENGTH_SHORT)
-            .show()
-    } else {
-        var i = 0
-           while (cursor.moveToNext()) {
-                val id = cursor.getString(cursor.getColumnIndex(colummns.get(0)))
-                val name = cursor.getString(cursor.getColumnIndex(colummns.get(1)))
-                val contact = Contact(name, id)
-                Log.d("PHONE", name + " " + i.toString())
-               if (Integer.parseInt(cursor.getString(cursor.getColumnIndex(ContactsContract.Contacts.HAS_PHONE_NUMBER))) > 0) {
-                   val phones = contentResolver.query(
-                       Phone.CONTENT_URI, null,
-                       Phone.CONTACT_ID + " = " + id, null, null
-                   )
-                   if (phones != null) {
-                       while (phones.moveToNext()) {
-                           val number: String =
-                               phones.getString(phones.getColumnIndex(Phone.NUMBER))
-                           val type: Int = phones.getInt(phones.getColumnIndex(Phone.TYPE))
-                           arrayList.add(Contact(name, number))
-                       }
-                   }
-               }
-                else{
-                    arrayList.add(Contact(name,"Нет номера"))
+// Используется для предоставления доступа к хранилищу данных приложения другим приложениям.
+// Пример использования в приложениях: Приложения для контактов, приложения настроек телефона
+class ContentExampleActivity : AppCompatActivity(),
+    LoaderManager.LoaderCallbacks<Cursor> {// для асинхронной загрузки
+        private lateinit var cursorAdapter: ContactsAdapter // адаптер для списка контактов
+        lateinit var contacts: ArrayList<Contact>// список контактов
+        
+        @SuppressLint("Recycle", "Range")
+        override fun onCreate(savedInstanceState: Bundle?) {
+            super.onCreate(savedInstanceState)
+            setContentView(R.layout.content_example_activity)
+            // add new record - dialog box
+            val btn_add = findViewById<View>(R.id.btn_add)//кнопка для добавления контакта
+            btn_add.setOnClickListener {
+                insertContact("", "", false, false)
+            }
+            // получаем список данных от поставщика
+            val contactUri = contentResolver.query(ContactProvider.CONTENT_URI, null, null, null, null) as Cursor
+            contacts = arrayListOf()
+            if (contactUri.moveToFirst()) {// добавлем в список
+                while(!contactUri.isAfterLast()) {
+                    val name = contactUri.getString(contactUri.getColumnIndex(DBHelper.CONTACT_NAME))
+                    val phone = contactUri.getString(contactUri.getColumnIndex(DBHelper.CONTACT_PHONE))
+                    contacts.add(Contact(name, phone))// добавляем список
+                    contactUri.moveToNext()
                 }
-           }
+            }
+            Toast.makeText(this, "Кол-во контактов: ${contacts.size}", Toast.LENGTH_LONG).show()
+            val list = findViewById<View>(R.id.lv_contacts) as ListView
+            cursorAdapter = ContactsAdapter(contacts, this)// добавлем контакты в адаптер
+            list.adapter = cursorAdapter
+        }
 
-        listview = findViewById(R.id.contact_listview)
-        adapter = ContactAdapter(arrayList, this)
-        listview.adapter = adapter
+        // передаем строки и было ли пустое поля для ошибки
+        fun insertContact(contactName: String, contactPhone: String, emptyName: Boolean, emptyNumber: Boolean)
+        {
+            val li = LayoutInflater.from(this@ContentExampleActivity)
+
+            // диалоговое окно
+            val getEmpIdView: View = li.inflate(R.layout.dialog_box, null)
+            val builder: android.app.AlertDialog.Builder =
+                android.app.AlertDialog.Builder(this@ContentExampleActivity)
+            builder.setTitle("Добавить новый нонтакт")
+            builder.setView(getEmpIdView)
+
+            // поля для ввода
+            val et_name = getEmpIdView.findViewById<View>(R.id.et_name) as EditText
+            val et_number = getEmpIdView.findViewById<View>(R.id.et_number) as EditText
+
+            //если было пустое при отправке, выдаем ошибку
+            if (emptyName) et_name.error = "Не введено имя"
+            if (emptyNumber) et_number.error = "Не введен номер"
+
+            // если был текст ранее, присваиваем
+            et_name.text = Editable.Factory.getInstance().newEditable(contactName)
+            et_number.text = Editable.Factory.getInstance().newEditable(contactPhone)
+            // set dialog message
+            with(builder) {
+                setCancelable(true)
+
+                setPositiveButton("Добавить"
+                ) { dialog, id -> // get user input and set it to result
+                    // если оба поля не пустые
+                    if (!et_name.text.toString().isEmpty() && !et_number.text.toString()
+                            .isEmpty()
+                    ) {
+                        // добавляем в поля для отправки
+                        val values = ContentValues()
+                        values.put(DBHelper.CONTACT_NAME, et_name.text.toString())
+                        values.put(DBHelper.CONTACT_PHONE, et_number.text.toString())
+                        // insert значений в ContentProvider
+                        contentResolver.insert(ContactProvider.CONTENT_URI, values)
+                        // добавляем в список
+                        contacts.add(Contact(et_name.text.toString(), et_number.text.toString()))
+                        // изменяем adapter согласно новому списку
+                        cursorAdapter.notifyDataSetChanged()
+                    }
+                    //иначе вызываем окно с пометкой пустого поля
+                    else {
+                        insertContact(
+                            et_name.text.toString(),
+                            et_number.text.toString(),
+                            et_name.text.toString().isEmpty(),
+                            et_number.text.toString().isEmpty()
+                        )
+                    }
+                    restartLoader()
+                }
+                setNegativeButton("Отмена", null)
+                show()
+            }
+        }
+
+        // удаляем контакты
+        fun deleteAllContacts(view: View) {
+            // очищаем список
+            contacts.clear()
+            // изменяем adapter согласно новому списку
+            cursorAdapter.notifyDataSetChanged()
+            // удаляем список из content provider
+            contentResolver.delete(ContactProvider.CONTENT_URI, null, null)
+            restartLoader()
+            Toast.makeText(this, "Все контакты удалены", Toast.LENGTH_LONG).show()
+        }
+
+        private fun restartLoader() {// дополнительные функции
+        }
+
+        override fun onCreateLoader(i: Int, bundle: Bundle?): Loader<Cursor?> {
+            return CursorLoader(
+                this, ContactProvider.CONTENT_URI, null,
+                null, null, null
+            )
+        }
+
+        override fun onLoadFinished(loader: Loader<Cursor?>, data: Cursor?) {
+            TODO("Not yet implemented")
+        }
+
+        override fun onLoaderReset(loader: Loader<Cursor?>) {
+            TODO("Not yet implemented")
+        }
     }
-}

@@ -9,12 +9,20 @@
     android:orientation="vertical"
     tools:context=".MainActivity">
 
+    <TextView
+        android:id="@+id/textView3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="@string/activity" />
+
     <Button
         android:id="@+id/btn_Receiver"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_weight="1"
         android:gravity="center"
+        android:onClick="BroadcastReceiver"
         android:text="@string/broadcast_receivers" />
 
     <Button

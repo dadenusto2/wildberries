@@ -6,12 +6,17 @@ import android.os.Bundle
 import android.view.View
 import androidx.appcompat.app.AppCompatActivity
 import androidx.localbroadcastmanager.content.LocalBroadcastManager
+import com.example.week1.Receivers.AirplaneReceiver
+import com.example.week1.Receivers.MessageReceiver
 
-
+// Broadcast Receiver
+// Предназначен для получения различных сообщений от системы или других приложений
+// Например, может применятся в приложениях, требющих постоянное подключение к интернету
+// Пример использования в приложениях: Chrome, яндекс.клавиатура, различные лаунчеры
 class ReceiverExampleActivity : AppCompatActivity() {
-    lateinit var localBroadcastManager : LocalBroadcastManager
-    var brMessage: MessageReceiver = MessageReceiver()
-    var brAirplane: AirplaneReceiver = AirplaneReceiver()
+    lateinit var brMessage: MessageReceiver // receiver для прослушивания сообщений
+    lateinit var brAirplane: AirplaneReceiver // receiver для обнаружения включения режима в самолете
+    lateinit var localBroadcastManager : LocalBroadcastManager // рассылка для сообщений внутри приложения
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -20,37 +25,42 @@ class ReceiverExampleActivity : AppCompatActivity() {
 
     override fun onPause() {
         super.onPause()
+        // снимаем регестрацию
         unregisterReceiver(brMessage)
         unregisterReceiver(brAirplane)
+        localBroadcastManager.unregisterReceiver(brMessage)
     }
 
     override fun onResume() {
         super.onResume()
 
-        val ifilter = IntentFilter()
-        ifilter.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
-        registerReceiver(brAirplane, ifilter)
+        brMessage = MessageReceiver() // объект необходимого ресивера
+        val ifilterMessageReceiver = IntentFilter() // какие намерения приложение должно обрабатывать
+        ifilterMessageReceiver.addAction("sendMessage")// название намерения
+        registerReceiver(brMessage, ifilterMessageReceiver) // регестрируем receiver
 
-        val ifilter1 = IntentFilter()
-        ifilter1.addAction("sendMessage")
-        registerReceiver(brMessage, ifilter1)
+        brAirplane = AirplaneReceiver()
+        val ifilterAirplaneReceiver = IntentFilter()
+        ifilterAirplaneReceiver.addAction(Intent.ACTION_AIRPLANE_MODE_CHANGED)
+        registerReceiver(brAirplane, ifilterAirplaneReceiver)
 
+        // отдельный тип для локальных сообщений
         localBroadcastManager = LocalBroadcastManager.getInstance(this@ReceiverExampleActivity)
-        val ifilter2 = IntentFilter()
-        ifilter2.addAction("sendMessage")
-        localBroadcastManager.registerReceiver(brMessage, ifilter2)
+        val ifilterLocalBroadcastManager = IntentFilter()
+        ifilterLocalBroadcastManager.addAction("sendMessageLocal")
+        localBroadcastManager.registerReceiver(brMessage, ifilterLocalBroadcastManager)
     }
 
-    fun sendMessage(view: View) {
+    fun sendMessage(view: View) {// отправка сообщения системе
         Intent().also { intent ->
-            intent.action = "sendMessage"
-            intent.putExtra("Message", "Сообщение отправлено из ReceiverExampleActivity")
-            sendBroadcast(intent)
+            intent.action = "sendMessage"//название намерения
+            intent.putExtra("Message", "Сообщение отправлено из ReceiverExampleActivity") // сообщение
+            sendBroadcast(intent)//отправка
         }
     }
-    fun sendMessageLocal(view: View) {
+    fun sendMessageLocal(view: View) {// отправка сообщения внутри приложения
         Intent().also { intent ->
-            intent.action = "sendMessage"
+            intent.action = "sendMessageLocal"
             intent.putExtra("Message", "Локальное сообщение отправлено из ReceiverExampleActivity")
             localBroadcastManager.sendBroadcast(intent)
         }

@@ -1,6 +1,0 @@
-<resources>
-    <string name="app_name">My Application</string>
-    <string name="name">Enter name</string>
-    <string name="id">ID</string>
-    <string name="number">Enter Number</string>
-</resources>

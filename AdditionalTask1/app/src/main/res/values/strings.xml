@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">AdditionalTask1</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="bubble_sort_name">Пузырьковая Сортиовка</string>
+    <string name="insertion_sort_name">Сортировка вставками</string>
+    <string name="selection_sort_name">Сортировка выбором</string>
+    <string name="quick_sort_name">Быстрая сортировка</string>
+</resources>

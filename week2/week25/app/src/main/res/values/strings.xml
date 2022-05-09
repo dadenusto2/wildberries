@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">week2.5</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="first_fragment">Первый фрагмент</string>
+    <string name="second_fragment">Второй фрагмент</string>
+    <string name="button">Alert dialog</string>
+</resources>

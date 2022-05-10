@@ -38,7 +38,9 @@ class ArrayFragment : Fragment() {
     private lateinit var btnBubble: Button
     private lateinit var btnSelection : Button
     private lateinit var btnInsertion: Button
-    private lateinit var btnMerge: Button
+    private lateinit var btnQuick: Button
+    private lateinit var btnStandart: Button
+    private lateinit var handler: Handler
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -68,21 +70,79 @@ class ArrayFragment : Fragment() {
 
         listSort = view.findViewById(R.id.sorted_list)
 
+        val spinner: Spinner = view.findViewById(R.id.spinner_sort)
+        val sort = arrayOf(
+                            "Выберите метод сортировки",
+                            resources.getString(R.string.bubble_sort_name),
+                            resources.getString(R.string.selection_sort_name),
+                            resources.getString(R.string.insertion_sort_name),
+                            resources.getString(R.string.quick_sort_name),
+                            resources.getString(R.string.standart_sort_name))
+        spinner.adapter =
+            activity?.let {
+                ArrayAdapter(it.applicationContext, R.layout.spinner_item, R.id.textView3, sort)
+            }
+
+        val checkBox = requireView().findViewById<CheckBox>(R.id.check_box_thread)
+
+        val itemSelectedListener: AdapterView.OnItemSelectedListener =
+            object : AdapterView.OnItemSelectedListener {
+                override fun onItemSelected(
+                    parent: AdapterView<*>,
+                    view: View,
+                    position: Int,
+                    id: Long
+                ) {
+                    // Получаем выбранный объект
+                    val item = parent.getItemAtPosition(position) as String
+                    when (item) {
+                        sort[1] -> onClickFun(::myBubbleSort, checkBox.isChecked, true, R.string.bubble_sort_name)
+                        sort[2] -> onClickFun(::selectionSort, checkBox.isChecked, true, R.string.selection_sort_name)
+                        sort[3] -> onClickFun(::insertionSort, checkBox.isChecked, true, R.string.insertion_sort_name)
+                        sort[4] -> onClickFun(::quickSort, checkBox.isChecked, true, R.string.quick_sort_name)
+                        sort[5] -> onClickFun(::standartSort, checkBox.isChecked, true, R.string.standart_sort_name)
+                    }
+
+                }
+
+                override fun onNothingSelected(parent: AdapterView<*>?) {}
+            }
+        spinner.onItemSelectedListener = itemSelectedListener
+
         algorithmName = view.findViewById(R.id.algorithm_name)
         algorithmTime = view.findViewById(R.id.algorithm_time)
 
-        btnBubble = view.findViewById(R.id.bubble_sort)
+        /*btnBubble = view.findViewById(R.id.bubble_sort)
         btnSelection = view.findViewById(R.id.selection_sort)
         btnInsertion = view.findViewById(R.id.insertion_sort)
-        btnMerge = view.findViewById(R.id.quick_sort)
+        btnQuick = view.findViewById(R.id.quick_sort)
+        btnStandart = view.findViewById(R.id.standart_sort)*/
 
         val btnFast: Button = view.findViewById(R.id.faster_algorithm)
         btnFast.setOnClickListener {
-            fasterAlgorithm()
+            handler = Handler()
+            val thread = Thread(Runnable {
+                fasterAlgorithm()
+            })
+            thread.start()
+            try {
+                thread.join()
+            } catch (e: InterruptedException) {
+                e.printStackTrace()
+            }
         }
-        val checkBox = requireView().findViewById<CheckBox>(R.id.check_box_thread)
 
-        btnBubble.setOnClickListener {
+        val btnShiffle: Button = view.findViewById(R.id.shuffle)
+        btnShiffle.setOnClickListener {
+            shuffle()
+            listView.adapter =
+                activity?.let {
+                    ArrayAdapter(it.applicationContext, R.layout.list_item, R.id.text1, array)
+                }
+        }
+
+
+        /*btnBubble.setOnClickListener {
             onClickFun(::myBubbleSort, checkBox.isChecked, true, R.string.bubble_sort_name)
         }
 
@@ -94,10 +154,13 @@ class ArrayFragment : Fragment() {
             onClickFun(::insertionSort, checkBox.isChecked, true, R.string.insertion_sort_name)
         }
 
-        btnMerge.setOnClickListener {
+        btnQuick.setOnClickListener {
             onClickFun(::quickSort,checkBox.isChecked, true, R.string.quick_sort_name)
         }
 
+        btnStandart.setOnClickListener {
+            onClickFun(::standartSort,checkBox.isChecked, true, R.string.standart_sort_name)
+        }*/
     }
 
     fun chengeView(workTime: Long, name: String, mas: Array<Int>){
@@ -108,18 +171,18 @@ class ArrayFragment : Fragment() {
                 ArrayAdapter(it.applicationContext, R.layout.list_item, R.id.text1, mas)
             }
         //Toast.makeText(getContext(), "Завершена работа через Thread", Toast.LENGTH_SHORT).show()
-        btnEnabled(true)
+        //btnEnabled(true)
     }
 
-    fun btnEnabled(b: Boolean = true){
+    /*fun btnEnabled(b: Boolean = true){
         btnBubble.isEnabled  = b
         btnSelection.isEnabled  = b
         btnInsertion.isEnabled  = b
-        btnMerge.isEnabled  = b
-    }
+        btnQuick.isEnabled  = b
+    }*/
 
     fun fasterAlgorithm(){
-        var time = arrayOf(
+        val time = arrayOf(
                 FastTime(
                     onClickFun(::myBubbleSort, true, false, R.string.bubble_sort_name),
                     "myBubbleSort",
@@ -193,19 +256,22 @@ class ArrayFragment : Fragment() {
         }
 
         Log.d("Time", minIndex.toString())
-        Toast.makeText(getContext(), "Самое маленькое время: " + minTime
-                + " у алгоритма: " + time[minIndex].name + ", Thread: "+time[minIndex].thread,
-            Toast.LENGTH_LONG).show()
-        btnEnabled(true)
+        val runnable = Runnable {
+            Toast.makeText(
+                getContext(), "Самое маленькое время: " + minTime
+                        + " у алгоритма: " + time[minIndex].name + ", Thread: " + time[minIndex].thread,
+                Toast.LENGTH_LONG
+            ).show()
+        }
+        handler.postDelayed(runnable, 0)
+        //btnEnabled(true)
     }
 
     fun onClickFun(sort: (array: Array<Int>) -> Coordinates, isChecked:Boolean, isCreateView: Boolean, nameId: Int) : Long{
-        if(isCreateView)
-            btnEnabled(false)
+            //btnEnabled(false)
         var time: Long = Long.MAX_VALUE
         if(isChecked) {
             //Toast.makeText(getContext(), "Работает через Thread", Toast.LENGTH_SHORT).show()
-            val handler = Handler()
             val thread = Thread(Runnable {
                 val mas = array.clone()
                 val coordinates: Coordinates = sort(mas)
@@ -218,6 +284,7 @@ class ArrayFragment : Fragment() {
                             coordinates.mas
                         )
                     }
+                    handler = Handler()
                     handler.postDelayed(runnable, 0)
                 }
             })
@@ -245,24 +312,27 @@ class ArrayFragment : Fragment() {
         }
     }
 
+    fun shuffle(){
+        array.shuffle()
+    }
+
     fun myBubbleSort(array: Array<Int>): Coordinates {
-        val mas = array.clone()
         var isSorted = false
         var buf: Int
         val time = System.currentTimeMillis()
         while (!isSorted) {
             isSorted = true
-            for (i in 0..mas.size - 2) {
-                if (mas[i] > mas[i + 1]) {
+            for (i in 0..array.size - 2) {
+                if (array[i] > array[i + 1]) {
                     isSorted = false
-                    buf = mas[i]
-                    mas[i] = mas[i + 1]
-                    mas[i + 1] = buf
+                    buf = array[i]
+                    array[i] = array[i + 1]
+                    array[i + 1] = buf
                 }
             }
         }
         val workTime: Long = System.currentTimeMillis() - time
-        return Coordinates(mas, workTime)
+        return Coordinates(array, workTime)
     }
 
 
@@ -285,30 +355,35 @@ class ArrayFragment : Fragment() {
     }
 
     fun selectionSort(array: Array<Int>): Coordinates {
-        val mas = array.clone()
         val time = System.currentTimeMillis()
-        for (i in 0 until mas.size - 1) {
+        for (i in 0 until array.size - 1) {
             var minPos = i
             for (j in i + 1 until array.size) {
-                if (mas[j].compareTo(mas[minPos]) < 0) {
+                if (array[j].compareTo(array[minPos]) < 0) {
                     minPos = j
                 }
             }
-            val saveValue = mas[minPos]
-            mas[minPos] = mas[i]
-            mas[i] = saveValue
+            val saveValue = array[minPos]
+            array[minPos] = array[i]
+            array[i] = saveValue
         }
 
         val workTime: Long = System.currentTimeMillis() - time
-        return Coordinates(mas, workTime)
+        return Coordinates(array, workTime)
     }
 
     fun quickSort(array: Array<Int>): Coordinates {
         val startIndex = 0
         val endIndex: Int = array.size - 1
-        val mas = array.clone()
         val time = System.currentTimeMillis()
-        doSort(mas, startIndex, endIndex)
+        doSort(array, startIndex, endIndex)
+        val workTime: Long = System.currentTimeMillis() - time
+        return Coordinates(array, workTime)
+    }
+    
+    fun standartSort(array: Array<Int>): Coordinates {
+        val time = System.currentTimeMillis()
+        val mas = array.sortedArray()
         val workTime: Long = System.currentTimeMillis() - time
         return Coordinates(mas, workTime)
     }

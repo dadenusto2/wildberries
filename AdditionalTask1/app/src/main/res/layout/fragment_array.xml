@@ -12,14 +12,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:gravity="center"
-        android:text="Через Thread?" />
-
-    <Button
-        android:id="@+id/faster_algorithm"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Найти самый быстрый алгоритм" />
+        android:text="@string/thread" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -27,12 +20,55 @@
         android:orientation="horizontal">
 
         <Button
+            android:id="@+id/faster_algorithm"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:text="Найти самый быстрый алгоритм"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/shuffle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:text="Перемешать исходный массив"
+            android:textSize="10sp" />
+
+        <Button
+            android:id="@+id/standart_sort"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="8dp"
+            android:layout_weight="1"
+            android:text="@string/standart_sort_name"
+            android:textSize="10sp"
+            android:visibility="gone" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <Spinner
+            android:id="@+id/spinner_sort"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1" />
+
+        <Button
             android:id="@+id/bubble_sort"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
-            android:text="@string/bubble_sort_name" />
+            android:text="@string/bubble_sort_name"
+            android:textSize="10sp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/insertion_sort"
@@ -40,7 +76,9 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
-            android:text="@string/insertion_sort_name" />
+            android:text="@string/insertion_sort_name"
+            android:textSize="10sp"
+            android:visibility="gone" />
 
     </LinearLayout>
 
@@ -55,7 +93,9 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
-            android:text="@string/quick_sort_name" />
+            android:text="@string/quick_sort_name"
+            android:textSize="10sp"
+            android:visibility="gone" />
 
         <Button
             android:id="@+id/selection_sort"
@@ -63,7 +103,9 @@
             android:layout_height="wrap_content"
             android:layout_marginHorizontal="8dp"
             android:layout_weight="1"
-            android:text="@string/selection_sort_name" />
+            android:text="@string/selection_sort_name"
+            android:textSize="10sp"
+            android:visibility="gone" />
     </LinearLayout>
 
     <LinearLayout

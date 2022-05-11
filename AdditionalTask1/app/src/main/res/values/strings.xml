@@ -11,4 +11,12 @@
     <string name="array_name">Array</string>
     <string name="arraylist_name">ArrayList</string>
     <string name="linkedlist_name">LinkedList</string>
+    <string name="fastest_algorithm_name">Найти самый быстрый алгоритм</string>
+    <string name="shuffle_array">Перемешать исходный массив</string>
+    <string name="original_array">Оригинальный массив</string>
+    <string name="size">Размер</string>
+    <string name="algorithm">Алгоритм</string>
+    <string name="time">Время</string>
+    <string name="count_elem">Введите кол-во элементов</string>
+    <string name="chose_struct">Выберите структуру данных</string>
 </resources>

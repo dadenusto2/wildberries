@@ -2,7 +2,6 @@ package com.example.additionaltask1
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.View
 import android.view.inputmethod.InputMethodManager
 import android.widget.*
@@ -45,9 +44,9 @@ class MainActivity : AppCompatActivity() {
             resources.getString(R.string.linkedlist_name)
         )
         spinner.adapter =// задаем адаптер
-            ArrayAdapter(this, R.layout.spinner_item, R.id.textView3, data)
+            ArrayAdapter(this, R.layout.spinner_item, R.id.tv_spinner, data)
 
-        val countString = findViewById<EditText>(R.id.editTextNumber)
+        val countString = findViewById<EditText>(R.id.et_countOfElem)
         countString.addTextChangedListener(// если текст изменен и выбрана структура сбрасывается структура
             afterTextChanged = {
                 if(spinner.selectedItemId != 0.toLong())
@@ -103,7 +102,7 @@ class MainActivity : AppCompatActivity() {
 
          val fm: FragmentManager = supportFragmentManager
 
-         val countString = findViewById<EditText>(R.id.editTextNumber).text.toString()
+         val countString = findViewById<EditText>(R.id.et_countOfElem).text.toString()
 
          var fragment = fm.findFragmentById(R.id.fragmentContainer)
 
@@ -123,13 +122,13 @@ class MainActivity : AppCompatActivity() {
                  .commit()
          }
          else// если пустое кол-во элементов , то задаем ошибку
-             findViewById<EditText>(R.id.editTextNumber).setError("Введите кол-во элементов")
+             findViewById<EditText>(R.id.et_countOfElem).setError("Введите кол-во элементов")
      }
     fun hideKeyboard() {
         //Находим View с фокусом, так мы сможем получить правильный window token
         //Если такого View нет, то создадим одно, это для получения window token из него
         val imm = getSystemService(Context.INPUT_METHOD_SERVICE) as InputMethodManager
-        val view = findViewById<EditText>(R.id.editTextNumber)
+        val view = findViewById<EditText>(R.id.et_countOfElem)
         imm.hideSoftInputFromWindow(view.windowToken, 0)
     }
 }

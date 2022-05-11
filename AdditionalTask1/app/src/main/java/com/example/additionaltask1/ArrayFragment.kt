@@ -19,7 +19,7 @@ class ArrayFragment : Fragment() {
      * @property time - время сортировки
      * @constructor Create empty Array and time
      */
-    class arrayAndTime     // для хранения структуры и времени работы
+    class ArrayAndTime     // для хранения структуры и времени работы
         (val mas: Array<Int>, val time: Long)
 
     /**
@@ -39,6 +39,7 @@ class ArrayFragment : Fragment() {
     private lateinit var listSort: ListView
     private lateinit var algorithmName: TextView
     private lateinit var algorithmTime: TextView
+    private lateinit var algorithmThread: TextView
     private lateinit var handler: Handler
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -81,13 +82,17 @@ class ArrayFragment : Fragment() {
                             resources.getString(R.string.standart_sort_name))
         spinner.adapter =
             activity?.let {
-                ArrayAdapter(it.applicationContext, R.layout.spinner_item, R.id.textView3, sort)
+                ArrayAdapter(it.applicationContext, R.layout.spinner_item, R.id.tv_spinner, sort)
             }
 
         val checkBox = requireView().findViewById<CheckBox>(R.id.check_box_thread)// через thread
+        checkBox.setOnClickListener(){
+            spinner.setSelection(0)
+        }
 
         algorithmName = view.findViewById(R.id.algorithm_name)// название алгоритма
         algorithmTime = view.findViewById(R.id.algorithm_time)// время работы алгоритма
+        algorithmThread = view.findViewById(R.id.algorithm_thread)// время работы алгоритма
 
         // выбор алгоритма сортироки
         val itemSelectedListener: AdapterView.OnItemSelectedListener =
@@ -101,14 +106,6 @@ class ArrayFragment : Fragment() {
                     // Получаем выбранный объект
                     val item = parent.getItemAtPosition(position) as String
                     when (item) {
-                        sort[0] -> {// если ничего, то пустой отсортированный список
-                            listSort.adapter =
-                                activity?.let {
-                                    ArrayAdapter(it.applicationContext, R.layout.list_item, R.id.text1, arrayOfNulls<Int>(0))
-                                }
-                            algorithmName.text = ""
-                            algorithmTime.text = ""
-                        }
                         sort[1] -> onClickFun(::bubbleSort, checkBox.isChecked, true, R.string.bubble_sort_name)
                         sort[2] -> onClickFun(::selectionSort, checkBox.isChecked, true, R.string.selection_sort_name)
                         sort[3] -> onClickFun(::insertionSort, checkBox.isChecked, true, R.string.insertion_sort_name)
@@ -120,7 +117,7 @@ class ArrayFragment : Fragment() {
             }
         spinner.onItemSelectedListener = itemSelectedListener
 
-        val btnFast: Button = view.findViewById(R.id.faster_algorithm)// для поиска самогобыстрого алгоритма
+        val btnFast: Button = view.findViewById(R.id.btn_fasterAlgorithm)// для поиска самогобыстрого алгоритма
         btnFast.setOnClickListener {
             handler = Handler()
             val thread = Thread(Runnable {
@@ -134,7 +131,7 @@ class ArrayFragment : Fragment() {
             }
         }
 
-        val btnShiffle: Button = view.findViewById(R.id.shuffle)// для перемешивания массива
+        val btnShiffle: Button = view.findViewById(R.id.btn_shuffleArray)// для перемешивания массива
         btnShiffle.setOnClickListener {
             array.shuffle()
             listView.adapter =
@@ -151,17 +148,17 @@ class ArrayFragment : Fragment() {
      * @param name - название алгортма
      * @param mas-отсортированный массив
      */
-    fun chengeView(workTime: Long, name: String, mas: Array<Int>){
+    fun chengeView(workTime: Long, name: String, mas: Array<Int>, isThread: Boolean){
         algorithmTime.text = workTime.toString()
         algorithmName.text = name
-        listSort.adapter =
+        algorithmThread.text = isThread.toString()
             activity?.let {
                 ArrayAdapter(it.applicationContext, R.layout.list_item, R.id.text1, mas)
             }
     }
 
     /**
-     * Ищет саммый быстрый алгоритм путем перебора всех возможных алгоритмов
+     * Поиск самого быстрого алгоритма путем перебора всех возможных алгоритмов
      */
     fun fasterAlgorithm(){
         // для хранения времени работы, через потоки ли алгоритм и название алгоритма
@@ -222,6 +219,7 @@ class ArrayFragment : Fragment() {
         var minTime: Long = time[0].time
         var minIndex = 0
 
+
         for(i in 1 until time.size){
             if(time[i].time < minTime) {
                 minTime = time[i].time
@@ -250,21 +248,22 @@ class ArrayFragment : Fragment() {
      * @receiver
      * @return время работы алгоритма в мс
      */
-    fun onClickFun(sort: (array: Array<Int>) -> arrayAndTime, isThread:Boolean, isCreateView: Boolean, nameId: Int) : Long{
+    fun onClickFun(sort: (array: Array<Int>) -> ArrayAndTime, isThread:Boolean, isCreateView: Boolean, nameId: Int) : Long{
         var time: Long = Long.MAX_VALUE // Для времени работы
         if(isThread) {
             if(isCreateView)// если создаем отбражение, то  handler для отображения
                 handler = Handler()
             val thread = Thread(Runnable {// запускам сортировку
                 val mas = array.clone()// клонируем массив для сортировки
-                val arrayAndTime: arrayAndTime = sort(mas)// выполняем сортировку указзанной функцией
-                time = arrayAndTime.time// время работы
+                val ArrayAndTime: ArrayAndTime = sort(mas)// выполняем сортировку указзанной функцией
+                time = ArrayAndTime.time// время работы
                 if(isCreateView) {// если отображаем список
                     val runnable = Runnable {
                         chengeView(
-                            arrayAndTime.time,
+                            ArrayAndTime.time,
                             resources.getString(nameId),
-                            arrayAndTime.mas
+                            ArrayAndTime.mas,
+                            isThread
                         )
                     }
                     handler.postDelayed(runnable, 0)
@@ -282,15 +281,16 @@ class ArrayFragment : Fragment() {
         }
         else{// если не через поток
             val mas = array.clone()
-            val arrayAndTime: arrayAndTime = sort(mas)
+            val ArrayAndTime: ArrayAndTime = sort(mas)
             if(isCreateView) {
                 chengeView(
-                    arrayAndTime.time,
+                    ArrayAndTime.time,
                     resources.getString(nameId),
-                    arrayAndTime.mas
+                    ArrayAndTime.mas,
+                    isThread
                 )
             }
-            time = arrayAndTime.time
+            time = ArrayAndTime.time
             return time
         }
     }
@@ -301,15 +301,15 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun bubbleSort(array: Array<Int>): arrayAndTime {
+    fun bubbleSort(array: Array<Int>): ArrayAndTime {
         var isSorted = false
         var buf: Int
         val time = System.currentTimeMillis()
         while (!isSorted) {
             isSorted = true
             for (i in 0..array.size - 2) {
-                if (array[i] > array[i + 1]) {
-                    isSorted = false
+                if (array[i] > array[i + 1]) {// если следуюший меньше предыдущего меняем
+                    isSorted = false// значит массив не отсортирован
                     buf = array[i]
                     array[i] = array[i + 1]
                     array[i + 1] = buf
@@ -317,7 +317,7 @@ class ArrayFragment : Fragment() {
             }
         }
         val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(array, workTime)
+        return ArrayAndTime(array, workTime)
     }
 
     /**
@@ -326,11 +326,12 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun insertionSort(array: Array<Int>): arrayAndTime {
+    fun insertionSort(array: Array<Int>): ArrayAndTime {
         val time = System.currentTimeMillis()
         for (i in 1 until array.size) {
-            val current = array[i]
+            val current = array[i]// берем текущий элемент
             var j = i - 1
+            //просмативаем предыдущие и если текущий меньше предыдущего, меняем их местами
             while (j >= 0 && current < array[j]) {
                 array[j + 1] = array[j]
                 j--
@@ -338,7 +339,7 @@ class ArrayFragment : Fragment() {
             array[j + 1] = current
         }
         val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(array, workTime)
+        return ArrayAndTime(array, workTime)
     }
 
     /**
@@ -347,22 +348,25 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun selectionSort(array: Array<Int>): arrayAndTime {
+    fun selectionSort(array: Array<Int>): ArrayAndTime {
         val time = System.currentTimeMillis()
         for (i in 0 until array.size - 1) {
             var minPos = i
             for (j in i + 1 until array.size) {
-                if (array[j].compareTo(array[minPos]) < 0) {
+                if (array[j].compareTo(array[minPos]) < 0) {// находим минимальный элемент с текущего индекса
                     minPos = j
                 }
             }
-            val saveValue = array[minPos]
-            array[minPos] = array[i]
-            array[i] = saveValue
+            //меняем местами минимальный и текущий, если разные
+            if(minPos != i){
+                val saveValue = array[minPos]
+                array[minPos] = array[i]
+                array[i] = saveValue
+            }
         }
 
         val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(array, workTime)
+        return ArrayAndTime(array, workTime)
     }
 
     /**
@@ -371,34 +375,38 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun quickSort(array: Array<Int>): arrayAndTime {
+    fun quickSort(array: Array<Int>): ArrayAndTime {
         val startIndex = 0
         val endIndex: Int = array.size - 1
         val time = System.currentTimeMillis()
-        doQuickSort(array, startIndex, endIndex)
+        doQuickSort(array, startIndex, endIndex)// запускаем рекурсию
         val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(array, workTime)
+        return ArrayAndTime(array, workTime)
     }
 
     private fun doQuickSort(array: Array<Int>, start: Int, end: Int) {
         if (start >= end) return
         var i = start
         var j = end
+        // разбиваем массив опорным элементом
         var cur = i - (i - j) / 2
         while (i < j) {
+            // доходим до элемента слева, большого чем опорный элемент
             while (i < cur && array[i] <= array[cur]) {
                 i++
             }
+            // доходим до элемента справа, меньшего чем опорный элемент
             while (j > cur && array[cur] <= array[j]) {
                 j--
             }
-            if (i < j) {
+            if (i < j) {// меняем местами эти элементы
                 val temp = array[i]
                 array[i] = array[j]
                 array[j] = temp
                 if (i == cur) cur = j else if (j == cur) cur = i
             }
         }
+        // сортируем справа и слево тот опроного
         doQuickSort(array, start, cur)
         doQuickSort(array,cur + 1, end)
     }
@@ -409,11 +417,11 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun standartSort(array: Array<Int>): arrayAndTime {
+    fun standartSort(array: Array<Int>): ArrayAndTime {
         val time = System.currentTimeMillis()
         val mas = array.sortedArray()
         val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(mas, workTime)
+        return ArrayAndTime(mas, workTime)
     }
 
     companion object {

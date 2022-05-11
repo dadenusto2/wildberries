@@ -10,8 +10,16 @@ import android.widget.*
 import androidx.fragment.app.Fragment
 
 
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
-class ArrayFragment : Fragment() {
+
+/**
+ * A simple [Fragment] subclass.
+ * Use the [ArrayFragment.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class ArrayListFragment : Fragment() {
     /**
      * Отсортированный массив и время сортировки
      *
@@ -20,7 +28,7 @@ class ArrayFragment : Fragment() {
      * @constructor Create empty Array and time
      */
     class arrayAndTime     // для хранения структуры и времени работы
-        (val mas: Array<Int>, val time: Long)
+        (val mas: ArrayList<Int>, val time: Long)
 
     /**
      * Для хранения сортировки, ее имени, через потоки, id названия
@@ -31,11 +39,10 @@ class ArrayFragment : Fragment() {
      * @constructor Create empty Fast time
      */
     class FastTime     // getters and setters
-        (val time: Long, val thread: Boolean, val nameId: Int) {
-    }
+        (val time: Long, val thread: Boolean, val nameId: Int)
 
     private var countOfElement: Int = 0
-    private lateinit var array : Array<Int>
+    private var array : ArrayList<Int> = ArrayList()
     private lateinit var listSort: ListView
     private lateinit var algorithmName: TextView
     private lateinit var algorithmTime: TextView
@@ -46,9 +53,8 @@ class ArrayFragment : Fragment() {
         arguments?.let {
             countOfElement = it.getInt(ARG_PARAM1)
         }
-        array = Array(countOfElement) { 0 }// создаем массив
         for (i in 0..countOfElement-1){
-            array[i] = (0..countOfElement).random()
+            array.add((0..countOfElement).random())
         }
     }
 
@@ -61,6 +67,7 @@ class ArrayFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        Log.d("Type of array", array::class.java.typeName)
         val listView = view.findViewById<ListView>(R.id.original_list)
         listView.adapter =
             activity?.let {
@@ -69,9 +76,9 @@ class ArrayFragment : Fragment() {
 
         view.findViewById<TextView>(R.id.tv_array_size).text = array.size.toString()
 
-        listSort = view.findViewById(R.id.sorted_list) // для отсортированного массива
+        listSort = view.findViewById(R.id.sorted_list)
 
-        val spinner: Spinner = view.findViewById(R.id.spn_algorithm)// для выбора алгоритма
+        val spinner: Spinner = view.findViewById(R.id.spn_algorithm)
         val sort = arrayOf(
                             "Выберите метод сортировки",
                             resources.getString(R.string.bubble_sort_name),
@@ -84,12 +91,11 @@ class ArrayFragment : Fragment() {
                 ArrayAdapter(it.applicationContext, R.layout.spinner_item, R.id.textView3, sort)
             }
 
-        val checkBox = requireView().findViewById<CheckBox>(R.id.check_box_thread)// через thread
+        val checkBox = requireView().findViewById<CheckBox>(R.id.check_box_thread)
 
-        algorithmName = view.findViewById(R.id.algorithm_name)// название алгоритма
-        algorithmTime = view.findViewById(R.id.algorithm_time)// время работы алгоритма
+        algorithmName = view.findViewById(R.id.algorithm_name)
+        algorithmTime = view.findViewById(R.id.algorithm_time)
 
-        // выбор алгоритма сортироки
         val itemSelectedListener: AdapterView.OnItemSelectedListener =
             object : AdapterView.OnItemSelectedListener {
                 override fun onItemSelected(
@@ -101,7 +107,7 @@ class ArrayFragment : Fragment() {
                     // Получаем выбранный объект
                     val item = parent.getItemAtPosition(position) as String
                     when (item) {
-                        sort[0] -> {// если ничего, то пустой отсортированный список
+                        sort[0] -> {
                             listSort.adapter =
                                 activity?.let {
                                     ArrayAdapter(it.applicationContext, R.layout.list_item, R.id.text1, arrayOfNulls<Int>(0))
@@ -109,18 +115,20 @@ class ArrayFragment : Fragment() {
                             algorithmName.text = ""
                             algorithmTime.text = ""
                         }
-                        sort[1] -> onClickFun(::bubbleSort, checkBox.isChecked, true, R.string.bubble_sort_name)
+                        sort[1] -> onClickFun(::myBubbleSort, checkBox.isChecked, true, R.string.bubble_sort_name)
                         sort[2] -> onClickFun(::selectionSort, checkBox.isChecked, true, R.string.selection_sort_name)
                         sort[3] -> onClickFun(::insertionSort, checkBox.isChecked, true, R.string.insertion_sort_name)
                         sort[4] -> onClickFun(::quickSort, checkBox.isChecked, true, R.string.quick_sort_name)
                         sort[5] -> onClickFun(::standartSort, checkBox.isChecked, true, R.string.standart_sort_name)
                     }
+
                 }
+
                 override fun onNothingSelected(parent: AdapterView<*>?) {}
             }
         spinner.onItemSelectedListener = itemSelectedListener
 
-        val btnFast: Button = view.findViewById(R.id.faster_algorithm)// для поиска самогобыстрого алгоритма
+        val btnFast: Button = view.findViewById(R.id.faster_algorithm)
         btnFast.setOnClickListener {
             handler = Handler()
             val thread = Thread(Runnable {
@@ -134,9 +142,9 @@ class ArrayFragment : Fragment() {
             }
         }
 
-        val btnShiffle: Button = view.findViewById(R.id.shuffle)// для перемешивания массива
+        val btnShiffle: Button = view.findViewById(R.id.shuffle)
         btnShiffle.setOnClickListener {
-            array.shuffle()
+            shuffle()
             listView.adapter =
                 activity?.let {
                     ArrayAdapter(it.applicationContext, R.layout.list_item, R.id.text1, array)
@@ -144,14 +152,7 @@ class ArrayFragment : Fragment() {
         }
     }
 
-    /**
-     * Отображение отсортированного массива
-     *
-     * @param workTime - время работы
-     * @param name - название алгортма
-     * @param mas-отсортированный массив
-     */
-    fun chengeView(workTime: Long, name: String, mas: Array<Int>){
+    fun chengeView(workTime: Long, name: String, mas: ArrayList<Int>){
         algorithmTime.text = workTime.toString()
         algorithmName.text = name
         listSort.adapter =
@@ -160,14 +161,10 @@ class ArrayFragment : Fragment() {
             }
     }
 
-    /**
-     * Ищет саммый быстрый алгоритм путем перебора всех возможных алгоритмов
-     */
     fun fasterAlgorithm(){
-        // для хранения времени работы, через потоки ли алгоритм и название алгоритма
         val time = arrayOf(
                 FastTime(
-                    onClickFun(::bubbleSort, true, false, R.string.bubble_sort_name),
+                    onClickFun(::myBubbleSort, true, false, R.string.bubble_sort_name),
                     true,
                     R.string.bubble_sort_name
                 ),
@@ -186,13 +183,9 @@ class ArrayFragment : Fragment() {
                     true,
                     R.string.quick_sort_name
                 ),
-            FastTime(
-                onClickFun(::standartSort, true, false, R.string.standart_sort_name),
-                true,
-                R.string.standart_sort_name
-            ),
+
                 FastTime(
-                    onClickFun(::bubbleSort, false, false, R.string.bubble_sort_name),
+                    onClickFun(::myBubbleSort, false, false, R.string.bubble_sort_name),
                     false,
                     R.string.bubble_sort_name
                 ),
@@ -210,25 +203,22 @@ class ArrayFragment : Fragment() {
                     onClickFun(::quickSort, false, false, R.string.quick_sort_name),
                     false,
                     R.string.quick_sort_name
-                ),
-                FastTime(
-                    onClickFun(::standartSort, false, false, R.string.standart_sort_name),
-                    true,
-                    R.string.standart_sort_name
                 )
             )
 
-        // находим наименьшее время
         var minTime: Long = time[0].time
         var minIndex = 0
 
+        for(i in 0 until time.size){
+            Log.d("Time", time[i].toString())
+        }
         for(i in 1 until time.size){
             if(time[i].time < minTime) {
                 minTime = time[i].time
                 minIndex = i
             }
         }
-        // Вывод наибыстрейшего алгоритма, времени работы и через потоки ли
+
         Log.d("Time", minIndex.toString())
         val runnable = Runnable {
             Toast.makeText(
@@ -238,28 +228,18 @@ class ArrayFragment : Fragment() {
             ).show()
         }
         handler.postDelayed(runnable, 0)
+        //btnEnabled(true)
     }
-
-    /**
-     * Сортировка выбранным алгоритмом
-     *
-     * @param sort структура для сортировки
-     * @param isThread через потоки или нет
-     * @param isCreateView отображать ли отсортированный список
-     * @param nameId id строки с названием алгоритма
-     * @receiver
-     * @return время работы алгоритма в мс
-     */
-    fun onClickFun(sort: (array: Array<Int>) -> arrayAndTime, isThread:Boolean, isCreateView: Boolean, nameId: Int) : Long{
-        var time: Long = Long.MAX_VALUE // Для времени работы
-        if(isThread) {
-            if(isCreateView)// если создаем отбражение, то  handler для отображения
+    fun onClickFun(sort: (array: ArrayList<Int>) -> arrayAndTime, isChecked:Boolean, isCreateView: Boolean, nameId: Int) : Long{
+        var time: Long = Long.MAX_VALUE
+        if(isChecked) {
+            if(isCreateView)
                 handler = Handler()
-            val thread = Thread(Runnable {// запускам сортировку
-                val mas = array.clone()// клонируем массив для сортировки
-                val arrayAndTime: arrayAndTime = sort(mas)// выполняем сортировку указзанной функцией
-                time = arrayAndTime.time// время работы
-                if(isCreateView) {// если отображаем список
+            val thread = Thread(Runnable {
+                val mas = array.clone() as ArrayList<Int>
+                val arrayAndTime: arrayAndTime = sort(mas)
+                time = arrayAndTime.time
+                if(isCreateView) {
                     val runnable = Runnable {
                         chengeView(
                             arrayAndTime.time,
@@ -271,7 +251,7 @@ class ArrayFragment : Fragment() {
                 }
             })
             thread.start()
-            if(!isCreateView) {// есои не отображаем, ожидаем завершения потока для получения времени работы
+            if(!isCreateView) {
                 try {
                     thread.join()
                 } catch (e: InterruptedException) {
@@ -280,9 +260,9 @@ class ArrayFragment : Fragment() {
             }
             return time
         }
-        else{// если не через поток
+        else{
             val mas = array.clone()
-            val arrayAndTime: arrayAndTime = sort(mas)
+            val arrayAndTime: arrayAndTime = sort(mas as ArrayList<Int>)
             if(isCreateView) {
                 chengeView(
                     arrayAndTime.time,
@@ -295,13 +275,11 @@ class ArrayFragment : Fragment() {
         }
     }
 
-    /**
-     * Сортировка пузырьком
-     *
-     * @param array список для сортировки
-     * @return класс, содержащий исходный массив и время работы
-     */
-    fun bubbleSort(array: Array<Int>): arrayAndTime {
+    fun shuffle(){
+        array.shuffle()
+    }
+
+    fun myBubbleSort(array: ArrayList<Int>): arrayAndTime {
         var isSorted = false
         var buf: Int
         val time = System.currentTimeMillis()
@@ -320,13 +298,8 @@ class ArrayFragment : Fragment() {
         return arrayAndTime(array, workTime)
     }
 
-    /**
-     * Сортировка вставками
-     * *
-     * @param array список для сортировки
-     * @return класс, содержащий исходный массив и время работы
-     */
-    fun insertionSort(array: Array<Int>): arrayAndTime {
+
+    fun insertionSort(array: ArrayList<Int>): arrayAndTime {
         val time = System.currentTimeMillis()
         for (i in 1 until array.size) {
             val current = array[i]
@@ -335,19 +308,15 @@ class ArrayFragment : Fragment() {
                 array[j + 1] = array[j]
                 j--
             }
+            // в этой точке мы вышли, так что j так же -1
+            // или в первом элементе, где текущий >= a[j]
             array[j + 1] = current
         }
         val workTime: Long = System.currentTimeMillis() - time
         return arrayAndTime(array, workTime)
     }
 
-    /**
-     * Сортировка выбором
-     *
-     * @param array список для сортировки
-     * @return класс, содержащий исходный массив и время работы
-     */
-    fun selectionSort(array: Array<Int>): arrayAndTime {
+    fun selectionSort(array: ArrayList<Int>): arrayAndTime {
         val time = System.currentTimeMillis()
         for (i in 0 until array.size - 1) {
             var minPos = i
@@ -365,22 +334,23 @@ class ArrayFragment : Fragment() {
         return arrayAndTime(array, workTime)
     }
 
-    /**
-     * Быстрая сортировка
-     *
-     * @param array список для сортировки
-     * @return класс, содержащий исходный массив и время работы
-     */
-    fun quickSort(array: Array<Int>): arrayAndTime {
+    fun quickSort(array: ArrayList<Int>): arrayAndTime {
         val startIndex = 0
         val endIndex: Int = array.size - 1
         val time = System.currentTimeMillis()
-        doQuickSort(array, startIndex, endIndex)
+        doSort(array, startIndex, endIndex)
         val workTime: Long = System.currentTimeMillis() - time
         return arrayAndTime(array, workTime)
     }
 
-    private fun doQuickSort(array: Array<Int>, start: Int, end: Int) {
+    fun standartSort(array: ArrayList<Int>): arrayAndTime {
+        val time = System.currentTimeMillis()
+        array.sort()
+        val workTime: Long = System.currentTimeMillis() - time
+        return arrayAndTime(array, workTime)
+    }
+
+    private fun doSort(array: ArrayList<Int>, start: Int, end: Int) {
         if (start >= end) return
         var i = start
         var j = end
@@ -399,27 +369,15 @@ class ArrayFragment : Fragment() {
                 if (i == cur) cur = j else if (j == cur) cur = i
             }
         }
-        doQuickSort(array, start, cur)
-        doQuickSort(array,cur + 1, end)
-    }
-
-    /**
-     * Стандартный алгоритм сортировки для структуры
-     *
-     * @param array список для сортировки
-     * @return класс, содержащий исходный массив и время работы
-     */
-    fun standartSort(array: Array<Int>): arrayAndTime {
-        val time = System.currentTimeMillis()
-        val mas = array.sortedArray()
-        val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(mas, workTime)
+        doSort(array, start, cur)
+        doSort(array,cur + 1, end)
     }
 
     companion object {
+        // TODO: Rename and change types and number of parameters
         @JvmStatic
         fun newInstance(countOfElement: Int) =
-            ArrayFragment().apply {
+            ArrayListFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_PARAM1, countOfElement)
                 }

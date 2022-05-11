@@ -8,10 +8,19 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.fragment.app.Fragment
+import java.util.*
 
 
+// TODO: Rename parameter arguments, choose names that match
+// the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
 private const val ARG_PARAM1 = "param1"
-class ArrayFragment : Fragment() {
+
+/**
+ * A simple [Fragment] subclass.
+ * Use the [LinkedListFragment.newInstance] factory method to
+ * create an instance of this fragment.
+ */
+class LinkedListFragment : Fragment() {
     /**
      * Отсортированный массив и время сортировки
      *
@@ -20,7 +29,7 @@ class ArrayFragment : Fragment() {
      * @constructor Create empty Array and time
      */
     class arrayAndTime     // для хранения структуры и времени работы
-        (val mas: Array<Int>, val time: Long)
+        (val mas: LinkedList<Int>, val time: Long)
 
     /**
      * Для хранения сортировки, ее имени, через потоки, id названия
@@ -31,11 +40,11 @@ class ArrayFragment : Fragment() {
      * @constructor Create empty Fast time
      */
     class FastTime     // getters and setters
-        (val time: Long, val thread: Boolean, val nameId: Int) {
-    }
+        (val time: Long, val thread: Boolean, val nameId: Int)
 
+    // TODO: Rename and change types of parameters
     private var countOfElement: Int = 0
-    private lateinit var array : Array<Int>
+    private var array : LinkedList<Int> = LinkedList()
     private lateinit var listSort: ListView
     private lateinit var algorithmName: TextView
     private lateinit var algorithmTime: TextView
@@ -43,15 +52,14 @@ class ArrayFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        setRetainInstance(true)
         arguments?.let {
             countOfElement = it.getInt(ARG_PARAM1)
         }
-        array = Array(countOfElement) { 0 }// создаем массив
         for (i in 0..countOfElement-1){
-            array[i] = (0..countOfElement).random()
+            array.add((0..countOfElement).random())
         }
     }
-
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
@@ -73,12 +81,12 @@ class ArrayFragment : Fragment() {
 
         val spinner: Spinner = view.findViewById(R.id.spn_algorithm)// для выбора алгоритма
         val sort = arrayOf(
-                            "Выберите метод сортировки",
-                            resources.getString(R.string.bubble_sort_name),
-                            resources.getString(R.string.selection_sort_name),
-                            resources.getString(R.string.insertion_sort_name),
-                            resources.getString(R.string.quick_sort_name),
-                            resources.getString(R.string.standart_sort_name))
+            "Выберите метод сортировки",
+            resources.getString(R.string.bubble_sort_name),
+            resources.getString(R.string.selection_sort_name),
+            resources.getString(R.string.insertion_sort_name),
+            resources.getString(R.string.quick_sort_name),
+            resources.getString(R.string.standart_sort_name))
         spinner.adapter =
             activity?.let {
                 ArrayAdapter(it.applicationContext, R.layout.spinner_item, R.id.textView3, sort)
@@ -151,7 +159,7 @@ class ArrayFragment : Fragment() {
      * @param name - название алгортма
      * @param mas-отсортированный массив
      */
-    fun chengeView(workTime: Long, name: String, mas: Array<Int>){
+    fun chengeView(workTime: Long, name: String, mas: LinkedList<Int>){
         algorithmTime.text = workTime.toString()
         algorithmName.text = name
         listSort.adapter =
@@ -164,59 +172,59 @@ class ArrayFragment : Fragment() {
      * Ищет саммый быстрый алгоритм путем перебора всех возможных алгоритмов
      */
     fun fasterAlgorithm(){
-        // для хранения времени работы, через потоки ли алгоритм и название алгоритма
+        // для хранения времени работы, через потоки ли алгоритм и название алгоритма 
         val time = arrayOf(
-                FastTime(
-                    onClickFun(::bubbleSort, true, false, R.string.bubble_sort_name),
-                    true,
-                    R.string.bubble_sort_name
-                ),
-                FastTime(
-                    onClickFun(::selectionSort, true, false, R.string.selection_sort_name),
-                    true,
-                    R.string.selection_sort_name
-                ),
-                FastTime(
-                    onClickFun(::insertionSort, true, false, R.string.insertion_sort_name),
-                    true,
-                    R.string.insertion_sort_name
-                ),
-                FastTime(
-                    onClickFun(::quickSort, true, false, R.string.quick_sort_name),
-                    true,
-                    R.string.quick_sort_name
-                ),
-            FastTime(
+            LinkedListFragment.FastTime(
+                onClickFun(::bubbleSort, true, false, R.string.bubble_sort_name),
+                true,
+                R.string.bubble_sort_name
+            ),
+            LinkedListFragment.FastTime(
+                onClickFun(::selectionSort, true, false, R.string.selection_sort_name),
+                true,
+                R.string.selection_sort_name
+            ),
+            LinkedListFragment.FastTime(
+                onClickFun(::insertionSort, true, false, R.string.insertion_sort_name),
+                true,
+                R.string.insertion_sort_name
+            ),
+            LinkedListFragment.FastTime(
+                onClickFun(::quickSort, true, false, R.string.quick_sort_name),
+                true,
+                R.string.quick_sort_name
+            ),
+            LinkedListFragment.FastTime(
                 onClickFun(::standartSort, true, false, R.string.standart_sort_name),
                 true,
                 R.string.standart_sort_name
             ),
-                FastTime(
-                    onClickFun(::bubbleSort, false, false, R.string.bubble_sort_name),
-                    false,
-                    R.string.bubble_sort_name
-                ),
-                FastTime(
-                    onClickFun(::selectionSort, false, false, R.string.selection_sort_name),
-                    false,
-                    R.string.selection_sort_name
-                ),
-                FastTime(
-                    onClickFun(::insertionSort, false, false, R.string.insertion_sort_name),
-                    false,
-                    R.string.insertion_sort_name
-                ),
-                FastTime(
-                    onClickFun(::quickSort, false, false, R.string.quick_sort_name),
-                    false,
-                    R.string.quick_sort_name
-                ),
-                FastTime(
-                    onClickFun(::standartSort, false, false, R.string.standart_sort_name),
-                    true,
-                    R.string.standart_sort_name
-                )
+            LinkedListFragment.FastTime(
+                onClickFun(::bubbleSort, false, false, R.string.bubble_sort_name),
+                false,
+                R.string.bubble_sort_name
+            ),
+            LinkedListFragment.FastTime(
+                onClickFun(::selectionSort, false, false, R.string.selection_sort_name),
+                false,
+                R.string.selection_sort_name
+            ),
+            LinkedListFragment.FastTime(
+                onClickFun(::insertionSort, false, false, R.string.insertion_sort_name),
+                false,
+                R.string.insertion_sort_name
+            ),
+            LinkedListFragment.FastTime(
+                onClickFun(::quickSort, false, false, R.string.quick_sort_name),
+                false,
+                R.string.quick_sort_name
+            ),
+            LinkedListFragment.FastTime(
+                onClickFun(::standartSort, false, false, R.string.standart_sort_name),
+                true,
+                R.string.standart_sort_name
             )
+        )
 
         // находим наименьшее время
         var minTime: Long = time[0].time
@@ -250,21 +258,21 @@ class ArrayFragment : Fragment() {
      * @receiver
      * @return время работы алгоритма в мс
      */
-    fun onClickFun(sort: (array: Array<Int>) -> arrayAndTime, isThread:Boolean, isCreateView: Boolean, nameId: Int) : Long{
+    fun onClickFun(sort: (array: LinkedList<Int>) -> LinkedListFragment.arrayAndTime, isThread:Boolean, isCreateView: Boolean, nameId: Int) : Long{
         var time: Long = Long.MAX_VALUE // Для времени работы
         if(isThread) {
             if(isCreateView)// если создаем отбражение, то  handler для отображения
                 handler = Handler()
             val thread = Thread(Runnable {// запускам сортировку
-                val mas = array.clone()// клонируем массив для сортировки
-                val arrayAndTime: arrayAndTime = sort(mas)// выполняем сортировку указзанной функцией
+                val mas = array.clone() as LinkedList<Int>// клонируем массив для сортировки
+                val arrayAndTime: LinkedListFragment.arrayAndTime = sort(mas)// выполняем сортировку указзанной функцией
                 time = arrayAndTime.time// время работы
                 if(isCreateView) {// если отображаем список
                     val runnable = Runnable {
                         chengeView(
                             arrayAndTime.time,
                             resources.getString(nameId),
-                            arrayAndTime.mas
+                            arrayAndTime.mas as LinkedList<Int>
                         )
                     }
                     handler.postDelayed(runnable, 0)
@@ -281,13 +289,13 @@ class ArrayFragment : Fragment() {
             return time
         }
         else{// если не через поток
-            val mas = array.clone()
-            val arrayAndTime: arrayAndTime = sort(mas)
+            val mas = array.clone() as LinkedList<Int>
+            val arrayAndTime: LinkedListFragment.arrayAndTime = sort(mas)
             if(isCreateView) {
                 chengeView(
                     arrayAndTime.time,
                     resources.getString(nameId),
-                    arrayAndTime.mas
+                    arrayAndTime.mas as LinkedList<Int>
                 )
             }
             time = arrayAndTime.time
@@ -301,7 +309,7 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun bubbleSort(array: Array<Int>): arrayAndTime {
+    fun bubbleSort(array: LinkedList<Int>): LinkedListFragment.arrayAndTime {
         var isSorted = false
         var buf: Int
         val time = System.currentTimeMillis()
@@ -317,7 +325,7 @@ class ArrayFragment : Fragment() {
             }
         }
         val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(array, workTime)
+        return LinkedListFragment.arrayAndTime(array, workTime)
     }
 
     /**
@@ -326,7 +334,7 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun insertionSort(array: Array<Int>): arrayAndTime {
+    fun insertionSort(array: LinkedList<Int>): LinkedListFragment.arrayAndTime {
         val time = System.currentTimeMillis()
         for (i in 1 until array.size) {
             val current = array[i]
@@ -338,7 +346,7 @@ class ArrayFragment : Fragment() {
             array[j + 1] = current
         }
         val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(array, workTime)
+        return LinkedListFragment.arrayAndTime(array, workTime)
     }
 
     /**
@@ -347,7 +355,7 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun selectionSort(array: Array<Int>): arrayAndTime {
+    fun selectionSort(array: LinkedList<Int>): LinkedListFragment.arrayAndTime {
         val time = System.currentTimeMillis()
         for (i in 0 until array.size - 1) {
             var minPos = i
@@ -362,7 +370,7 @@ class ArrayFragment : Fragment() {
         }
 
         val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(array, workTime)
+        return LinkedListFragment.arrayAndTime(array, workTime)
     }
 
     /**
@@ -371,7 +379,7 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun quickSort(array: Array<Int>): arrayAndTime {
+    fun quickSort(array: LinkedList<Int>): LinkedListFragment.arrayAndTime {
         val startIndex = 0
         val endIndex: Int = array.size - 1
         val time = System.currentTimeMillis()
@@ -380,7 +388,7 @@ class ArrayFragment : Fragment() {
         return arrayAndTime(array, workTime)
     }
 
-    private fun doQuickSort(array: Array<Int>, start: Int, end: Int) {
+    private fun doQuickSort(array: LinkedList<Int>, start: Int, end: Int) {
         if (start >= end) return
         var i = start
         var j = end
@@ -409,17 +417,17 @@ class ArrayFragment : Fragment() {
      * @param array список для сортировки
      * @return класс, содержащий исходный массив и время работы
      */
-    fun standartSort(array: Array<Int>): arrayAndTime {
+    fun standartSort(array: LinkedList<Int>): arrayAndTime {
         val time = System.currentTimeMillis()
-        val mas = array.sortedArray()
+        array.sort()
         val workTime: Long = System.currentTimeMillis() - time
-        return arrayAndTime(mas, workTime)
+        return arrayAndTime(array, workTime)
     }
 
     companion object {
         @JvmStatic
         fun newInstance(countOfElement: Int) =
-            ArrayFragment().apply {
+            LinkedListFragment().apply {
                 arguments = Bundle().apply {
                     putInt(ARG_PARAM1, countOfElement)
                 }

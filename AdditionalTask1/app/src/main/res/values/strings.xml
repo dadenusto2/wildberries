@@ -8,4 +8,7 @@
     <string name="quick_sort_name">Быстрая сортировка</string>
     <string name="thread">Через Thread?</string>
     <string name="standart_sort_name">Стандартный алгоритм сортировки</string>
+    <string name="array_name">Array</string>
+    <string name="arraylist_name">ArrayList</string>
+    <string name="linkedlist_name">LinkedList</string>
 </resources>

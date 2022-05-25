@@ -1,0 +1,21 @@
+package com.example.week4
+
+import androidx.recyclerview.widget.ItemTouchHelper
+import androidx.recyclerview.widget.RecyclerView
+
+// для свайпа сообщений
+abstract class SwipeToDeleteCallback : ItemTouchHelper.Callback() {
+
+    override fun getMovementFlags(recyclerView: RecyclerView, viewHolder: RecyclerView.ViewHolder): Int {
+        val swipeFlag = ItemTouchHelper.LEFT or ItemTouchHelper.RIGHT
+        return makeMovementFlags(0, swipeFlag)
+    }
+
+    override fun onMove(
+        recyclerView: RecyclerView,
+        viewHolder: RecyclerView.ViewHolder,
+        target: RecyclerView.ViewHolder
+    ): Boolean {
+        return false
+    }
+}

@@ -10,6 +10,7 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.week52.Model.HeroData
+import com.squareup.picasso.Picasso
 import kotlin.reflect.full.memberExtensionProperties
 import kotlin.reflect.full.memberFunctions
 import kotlin.reflect.full.memberProperties
@@ -52,6 +53,20 @@ class HeroStatActivity: AppCompatActivity()  {
                     tvStatName.text = stat.name
                     tvStatValue.text = stat.get(curStat)?.toString()
                     layout.addView(statItem)
+                }
+            }
+            else if(stats.name == "images"){
+                stats.isAccessible = true
+                val curStat = stats.get(heroData)
+                val curStatFields = stats.get(heroData)!!.javaClass.declaredFields
+                for (stat in curStatFields) {
+                    stat.isAccessible = true
+                    if(stat.name == "lg") {
+                        val ivImg = findViewById<ImageView>(R.id.iv_img)
+                        Picasso.with(this)
+                            .load(stat.get(curStat)?.toString())
+                            .into(ivImg)
+                    }
                 }
             }
         }

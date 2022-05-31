@@ -28,21 +28,23 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        //retrifitLoop(1, layout)
+
         val gson = GsonBuilder()
             .setLenient()
             .create()
+
         val retrofit = Retrofit.Builder()
             .baseUrl("https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/")
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
+
         val service = retrofit.create(APIService::class.java)
         val call: Call<List<HeroData>> = service.users
         call.enqueue(object : Callback<List<HeroData>?> {
+
             override fun onResponse(call: Call<List<HeroData>?>, response: Response<List<HeroData>?>) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        Log.d("---",  response.body()!!.size.toString())
                         val listView: ListView? = findViewById(R.id.lv_heroes)
                         val adapter = HeroAdapter(this@MainActivity, response.body())
                         val mHandler = Handler(Looper.getMainLooper())
@@ -60,24 +62,12 @@ class MainActivity : AppCompatActivity() {
                                     startActivity(intent)
                                 }
                         }
-
-                        /*val heroItem = layoutInflater.inflate(R.layout.hero_item, null) as ViewGroup
-                        val tvHeroName = heroItem.findViewById<TextView>(R.id.tv_name)
-
-                        val ivIcon = heroItem.findViewById<ImageView>(R.id.iv_icon)
-                        Picasso.with(this@MainActivity)
-                            .load(response.body()!!.image.url)
-                            .into(ivIcon)
-                        tvHeroName.text = response.body()!!.name
-                        layout.addView(heroItem)*/
-
                     }
                 }
             }
 
             override fun onFailure(call: Call<List<HeroData>?>, t: Throwable) {
-                Log.d("---", call.toString())
-                Toast.makeText(this@MainActivity, "Nothing returned", Toast.LENGTH_LONG)
+                Toast.makeText(this@MainActivity, "Нет соединения!", Toast.LENGTH_LONG)
                     .show()
             }
 

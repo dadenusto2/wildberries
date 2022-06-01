@@ -25,32 +25,8 @@ public class Images implements Serializable {
         return xs;
     }
 
-    public void setXs(String xs) {
-        this.xs = xs;
-    }
-
-    public String getSm() {
-        return sm;
-    }
-
-    public void setSm(String sm) {
-        this.sm = sm;
-    }
-
-    public String getMd() {
-        return md;
-    }
-
-    public void setMd(String md) {
-        this.md = md;
-    }
-
     public String getLg() {
         return lg;
-    }
-
-    public void setLg(String lg) {
-        this.lg = lg;
     }
 
 }

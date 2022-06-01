@@ -1,20 +1,16 @@
 package com.example.week52
 
-import android.app.Activity
-import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.util.Log
-import android.view.LayoutInflater
-import android.view.View
-import android.view.ViewGroup
-import android.widget.*
+import android.widget.AdapterView
+import android.widget.ListView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.week52.Model.HeroData
 import com.google.gson.GsonBuilder
-import com.squareup.picasso.Picasso
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -23,103 +19,88 @@ import retrofit2.converter.gson.GsonConverterFactory
 import retrofit2.http.GET
 import java.io.Serializable
 
-
+const val BASE_URL = "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/"
 class MainActivity : AppCompatActivity() {
+    lateinit var swipeRefreshLayout : SwipeRefreshLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        //вызываем retrifit
+        getResponse()
 
+        //задаем обновление на swipe to refresh
+        swipeRefreshLayout  = findViewById(R.id.sfl_heroes)
+        swipeRefreshLayout.setOnRefreshListener {
+            getResponse()
+        }
+    }
+
+    override fun onSaveInstanceState(outState: Bundle) {
+        super.onSaveInstanceState(outState)
+    }
+
+    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
+        super.onRestoreInstanceState(savedInstanceState)
+    }
+
+    interface RetrofitService{//интерфейс для
+        @get:GET("all.json")
+        val heroesData: Call<List<HeroData>>
+    }
+
+    fun getResponse(){
+        //задаем gson для конвертации
         val gson = GsonBuilder()
-            .setLenient()
-            .create()
+        .setLenient()
+        .create()
 
+        //создаем запрос
         val retrofit = Retrofit.Builder()
-            .baseUrl("https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/")
+            .baseUrl(BASE_URL)
             .addConverterFactory(GsonConverterFactory.create(gson))
             .build()
 
-        val service = retrofit.create(APIService::class.java)
-        val call: Call<List<HeroData>> = service.users
+        //указываем класс для класс интерфеса для запрроса
+        val service = retrofit.create(RetrofitService::class.java)
+        val call: Call<List<HeroData>> = service.heroesData
+        //делаем запрос
         call.enqueue(object : Callback<List<HeroData>?> {
-
+            // при получении списока героев передаем их в адаптер для создания списка
             override fun onResponse(call: Call<List<HeroData>?>, response: Response<List<HeroData>?>) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
-                        val listView: ListView? = findViewById(R.id.lv_heroes)
-                        val adapter = HeroAdapter(this@MainActivity, response.body())
-                        val mHandler = Handler(Looper.getMainLooper())
-                        mHandler.post {
-                            listView?.adapter = adapter
-                            adapter.notifyDataSetChanged()
-                            listView?.onItemClickListener =
-                                AdapterView.OnItemClickListener { parent, view, position, id ->
-                                    val intent = Intent(
-                                        this@MainActivity,
-                                        HeroStatActivity::class.java
-                                    )
-                                    val heroData = response.body() as List<HeroData>
-                                    intent.putExtra("HeroData", heroData[position] as Serializable)
-                                    startActivity(intent)
-                                }
-                        }
+                        setList(response.body())
                     }
                 }
             }
-
             override fun onFailure(call: Call<List<HeroData>?>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "Нет соединения!", Toast.LENGTH_LONG)
                     .show()
+                swipeRefreshLayout.isRefreshing = false
             }
-
         })
     }
-    interface APIService{
-        @get:GET("all.json")
-        val users: Call<List<HeroData>>
-    }
-}
-class HeroAdapter(private var activity: Activity, private var listview: List<HeroData>?) : BaseAdapter() {
-    override fun getCount(): Int {
-        return listview!!.size
-    }
 
-    override fun getItem(p0: Int): Any {
-        return listview!!.get(p0)
-    }
-
-    override fun getItemId(p0: Int): Long {
-        return p0.toLong()
-    }
-
-    private class ViewHolder(row: View?) {
-        var tvName: TextView? = null
-        var ivIcon: ImageView? = null
-        init {
-            this.tvName = row?.findViewById(R.id.tv_name)
-            this.ivIcon =row?.findViewById(R.id.iv_icon)
+    // создание списка героев
+    fun setList(heroesList :List<HeroData>?) {
+        val listView: ListView? = findViewById(R.id.lv_heroes)
+        //создаем адаптер
+        val adapter = HeroAdapter(this@MainActivity, heroesList)
+        val mHandler = Handler(Looper.getMainLooper())
+        mHandler.post {
+            listView?.adapter = adapter//задаем адаптер
+            adapter.notifyDataSetChanged()
+            swipeRefreshLayout.isRefreshing = false
+            listView?.onItemClickListener =//для запуска экрана с характеристиками героя
+                AdapterView.OnItemClickListener { parent, view, position, id ->
+                    val intent = Intent(
+                        this@MainActivity,
+                        HeroStatActivity::class.java
+                    )
+                    val heroData = heroesList as List<HeroData>
+                    intent.putExtra("HeroData", heroData[position] as Serializable)
+                    startActivity(intent)
+                }
         }
     }
-
-    override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
-        val view: View?
-        val viewHolder: ViewHolder
-        if (p1 == null) {
-            val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
-            view = inflater.inflate(R.layout.hero_item, null)
-            viewHolder = ViewHolder(view)
-            view?.tag = viewHolder
-        } else {
-            view = p1
-            viewHolder = view.tag as ViewHolder
-        }
-        val userDto = listview?.get(p0)
-
-        viewHolder.tvName?.text = userDto!!.name
-        Picasso.with(activity)
-            .load(userDto.images.xs)
-            .into(viewHolder.ivIcon)
-
-        return view as View
-    }
-
 }

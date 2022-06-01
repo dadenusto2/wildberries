@@ -23,33 +23,37 @@ class HeroStatActivity : AppCompatActivity() {
 
         val heroImgURL = heroData.img
 
-        ivImg = findViewById<ImageView>(R.id.iv_img)
+        // задаем картинку
+        ivImg = findViewById(R.id.iv_img)
         loadImg(heroImgURL)
 
         val layout = findViewById<LinearLayout>(R.id.lv_stat_list)
         val heroName = layoutInflater.inflate(R.layout.hero_stat_item, null) as ViewGroup
-        val tvStatName = heroName.findViewById<TextView>(R.id.tv_stat_name)
-        val tvStatValue = heroName.findViewById<TextView>(R.id.tv_stat_value)
-        tvStatName.text = resources.getString(R.string.localizedName)
-        tvStatValue.text = heroData.localizedName
+        val tvFieldName = heroName.findViewById<TextView>(R.id.tv_stat_name)
+        val tvName = heroName.findViewById<TextView>(R.id.tv_stat_value)
+        //задаем имя
+        tvFieldName.text = resources.getString(R.string.localizedName)
+        tvName.text = heroData.localizedName
         layout.addView(heroName)
 
-        val heroesStats = HeroData::class.memberProperties.sortedBy { !it.isLateinit}
-        for (stat in heroesStats) {
-            if(stat.name!="img" && stat.name!="icon" && stat.name!="localizedName") {
+        val heroProps = HeroData::class.memberProperties.sortedBy { !it.isLateinit}
+        for (curProp in heroProps) {
+            if(curProp.name!="img" && curProp.name!="icon" && curProp.name!="localizedName") {
                 val statItem = layoutInflater.inflate(R.layout.hero_stat_item, null) as ViewGroup
-                val tvStatName = statItem.findViewById<TextView>(R.id.tv_stat_name)
-                val tvStatValue = statItem.findViewById<TextView>(R.id.tv_stat_value)
+                val tvFieldName = statItem.findViewById<TextView>(R.id.tv_stat_name)
+                val tvValue = statItem.findViewById<TextView>(R.id.tv_stat_value)
+                // получаем локализованную строку для названия поля
                 val resString: Int = resources.getIdentifier(
-                    stat.name,
+                    curProp.name,
                     "string",
                     packageName.toString()
                 )
-                tvStatName.text = resources.getString(resString)
-                if(stat.get(heroData).toString() == "null")
-                    tvStatValue.text = "Отсутсвует"
+                tvFieldName.text = resources.getString(resString)
+                //задаем значение
+                if(curProp.get(heroData).toString() == "null")
+                    tvValue.text = "Отсутсвует"
                 else
-                    tvStatValue.text = stat.get(heroData).toString()
+                    tvValue.text = curProp.get(heroData).toString()
                 layout.addView(statItem)
             }
         }

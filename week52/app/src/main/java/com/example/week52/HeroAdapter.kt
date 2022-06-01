@@ -1,6 +1,5 @@
-package com.example.week51
+package com.example.week52
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
 import android.view.LayoutInflater
@@ -9,16 +8,17 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import coil.load
+import com.example.week52.Model.HeroData
+import com.squareup.picasso.Picasso
 
-//адаптер для списка героев
-class HeroAdapter(private var activity: Activity, private var listview: List<HeroData>?) : BaseAdapter() {
+//адаптер списка героев
+class HeroAdapter(private var activity: Activity, private var heroesList: List<HeroData>?) : BaseAdapter() {
     override fun getCount(): Int {
-        return listview!!.size
+        return heroesList!!.size
     }
 
     override fun getItem(p0: Int): Any {
-        return listview!![p0]
+        return heroesList!!.get(p0)
     }
 
     override fun getItemId(p0: Int): Long {
@@ -34,7 +34,7 @@ class HeroAdapter(private var activity: Activity, private var listview: List<Her
         }
     }
 
-    @SuppressLint("InflateParams")
+    //задаем огтображение списка героев
     override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
         val view: View?
         val viewHolder: ViewHolder
@@ -47,10 +47,12 @@ class HeroAdapter(private var activity: Activity, private var listview: List<Her
             view = p1
             viewHolder = view.tag as ViewHolder
         }
-        val heroData = listview?.get(p0)
+        val curHero = heroesList?.get(p0)
 
-        viewHolder.tvName?.text = heroData!!.localizedName
-        viewHolder.ivIcon?.load(BASE_URL+ heroData.icon)//загружаем иконку
+        viewHolder.tvName?.text = curHero!!.name
+        Picasso.with(activity)
+            .load(curHero.images.xs)
+            .into(viewHolder.ivIcon)
 
         return view as View
     }

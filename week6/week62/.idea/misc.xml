@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Users/kgeny/Desktop/WB/week6/week62/app/src/main/res/drawable/ic_launcher_background.xml" value="0.2965" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week6/week62/app/src/main/res/layout/activity_main.xml" value="0.31145833333333334" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week6/week62/app/src/main/res/layout/fragment_pi.xml" value="0.2477355072463768" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week6/week62/app/src/main/res/layout/fragment_timer.xml" value="0.31145833333333334" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week61/app/src/main/res/layout/activity_main.xml" value="0.3333333333333333" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week61/app/src/main/res/layout/fragment_pi.xml" value="0.22" />
+        <entry key="..\:/Users/kgeny/Desktop/WB/week61/app/src/main/res/layout/fragment_timer.xml" value="0.31145833333333334" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>

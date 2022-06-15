@@ -104,6 +104,7 @@ class FavoritesActivity: AppCompatActivity() {
                     for (element in imageUrls) {
                         val clientGet = HttpClient(Android) {}
                         val jsonText = clientGet.get<String>(element)
+                        Log.d("--+", element)
                         val favoriteImage = Json.decodeFromString<CatDataItem>(jsonText)
                         images.add(0, favoriteImage.url)
                     }

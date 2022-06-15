@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">week7.1</string>
+    <string name="localizedName">Имя</string>
+    <string name="baseHealth">Базовое здоровье</string>
+    <string name="baseHealthRegen">Базовая регенерация здоровья</string>
+    <string name="baseMana">Базовая мана</string>
+    <string name="baseManaRegen">Базовая регенерация маны</string>
+    <string name="baseArmor">Базовая защита</string>
+    <string name="baseMr">Базовое сопротивление магии</string>
+    <string name="baseAttackMin">Минимальная атака</string>
+    <string name="baseAttackMax">Максимальная атака</string>
+    <string name="baseStr">Базовая сила</string>
+    <string name="baseAgi">Базовая ловкость</string>
+    <string name="baseInt">Базовый интелект</string>
+    <string name="strGain">Базовый прирост силы</string>
+    <string name="agiGain">Базовый прирост ловкости</string>
+    <string name="intGain">Базовый прирост интелекта</string>
+    <string name="attackRange">Дальноть атаки</string>
+    <string name="projectileSpeed">Скорость снаряда</string>
+    <string name="attackRate">Базовое время атаки</string>
+    <string name="turnRate">Скорость поворота</string>
+    <string name="cmEnabled">Доступность консольных команд</string>
+    <string name="legs">Кол-во ног</string>
+    <string name="moveSpeed">Скорость</string>
+    <string name="primaryAttr">Основной атрибут</string>
+    <string name="roles">Роли</string>
+    <string name="attackType">Тип атаки</string>
+</resources>

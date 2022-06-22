@@ -3,6 +3,8 @@ package com.example.week82.model;
 
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
+
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
@@ -75,4 +77,16 @@ public class Appearance implements Serializable {
         this.hairColor = hairColor;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Appearance)) return false;
+        Appearance that = (Appearance) o;
+        return Objects.equals(getGender(), that.getGender()) && Objects.equals(getRace(), that.getRace()) && Objects.equals(getHeight(), that.getHeight()) && Objects.equals(getWeight(), that.getWeight()) && Objects.equals(getEyeColor(), that.getEyeColor()) && Objects.equals(getHairColor(), that.getHairColor());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getGender(), getRace(), getHeight(), getWeight(), getEyeColor(), getHairColor());
+    }
 }

@@ -59,15 +59,14 @@ class MainActivity : AppCompatActivity() {
         when (item.itemId) {
             R.id.action_update -> {
                 GlobalScope.launch {
-                    heroesRepository.updateHeroesList()
-                    swipeRefreshLayout.isRefreshing = false
+                    if (heroesRepository.updateHeroesList(true)) {
+                        getResponse()
+                    }
                 }
                 return true
             }
             R.id.action_delete -> {
-                GlobalScope.launch {
-                    heroesRepository.deleteFile()
-                }
+                heroesRepository.deleteFile()
                 return true
             }
         }
@@ -77,7 +76,7 @@ class MainActivity : AppCompatActivity() {
     /**
      * Запрос на создание списка из Shared Preferences или API
      */
-    private suspend fun getResponse() {
+    suspend fun getResponse() {
         var heroesList: List<HeroData>? = mutableListOf()
 
         val job: Job = lifecycleScope.launch {
@@ -85,7 +84,12 @@ class MainActivity : AppCompatActivity() {
         }
         job.start()
         job.join()
+        if (heroesList?.size == 0) {
+            swipeRefreshLayout.isRefreshing = false
+            return
+        }
         setList(heroesList)
+        swipeRefreshLayout.isRefreshing = false
     }
 
     /**

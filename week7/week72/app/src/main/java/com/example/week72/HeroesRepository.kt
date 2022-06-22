@@ -3,6 +3,7 @@ package com.example.week72
 import android.annotation.SuppressLint
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.week72.model.HeroData
@@ -31,31 +32,33 @@ class HeroesRepository(private val context: MainActivity) : Serializable {
      * @return список героев
      */
     suspend fun getHeroesList(): List<HeroData>? {
-        val job: Job
         heroesList = mutableListOf()
+        var heroesFromPreferences: List<HeroData>? = listOf()
+        var heroesFromAPI: List<HeroData>? = listOf()
         // получаеа героев из Shared Preferences
-        val heroesFromPreferences = getHeroesFromPref()
+        val jobGet = GlobalScope.launch {
+            heroesFromPreferences = getHeroesFromPref()
+            heroesFromAPI = getHeroesFromAPI()
+        }
+        jobGet.start()
+        jobGet.join()
+
+        val toastString: String
+
         //если не пустой, то из него
         if (heroesFromPreferences?.isNotEmpty() == true) {
-            job = GlobalScope.launch {
-                heroesList = heroesFromPreferences
-            }
-            context.lifecycleScope.launch {
-                Toast.makeText(context, "Данные из Shared Preferences!", Toast.LENGTH_LONG)
-                    .show()
-            }
-        } else { // иначе из API
-            job = GlobalScope.launch {
-                heroesList = getHeroesFromAPI()
-            }
-            context.lifecycleScope.launch {
-                Toast.makeText(context, "Данные из API!", Toast.LENGTH_LONG)
-                    .show()
-            }
+            heroesList = heroesFromPreferences
+            toastString = "Данные из Shared Preferences!"
+
+        } else if (heroesFromAPI?.size!! > 0) { // иначе из API
+            heroesList = heroesFromAPI
+            toastString = "Данные из API!"
+
+        } else {
+            toastString = "Нет подходящих данных!"
         }
-        job.start()
-        job.join()
-        context.swipeRefreshLayout.isRefreshing = false
+        Toast.makeText(context, toastString, Toast.LENGTH_LONG)
+            .show()
         return heroesList
     }
 
@@ -117,27 +120,35 @@ class HeroesRepository(private val context: MainActivity) : Serializable {
     /**
      * Обновление списка героев в Shared Preferences
      */
-    fun updateHeroesList() {
-        //Список из Shared Preferences
+    fun updateHeroesList(userUpdate: Boolean): Boolean {
         val heroesListFromFile = getHeroesFromPref()
-        //Список из API
         val heroesListFromApi = getHeroesFromAPI()
-        if (isEqual(heroesListFromFile, heroesListFromApi)) {// Если одинаковые, то из Shared Pref
-            context.lifecycleScope.launch() {
-                Toast.makeText(
-                    context,
-                    "Shared Preferences не требует обновления!",
-                    Toast.LENGTH_LONG
-                ).show()
+
+        val toastString: String
+        val updated: Boolean
+        if (!heroesListFromApi.isNullOrEmpty()) {
+            if (isEqual(heroesListFromFile, heroesListFromApi)) {
+                toastString = "Локальный файл не требует обновления"
+                updated = false
+            } else {
+                writeHeroesToPref(heroesListFromApi)
+                heroesList = heroesListFromApi.toMutableList()
+                toastString = "Локальный файл обновлен"
+                updated = true
             }
-        } else { // иначе обновляем
-            writeHeroesToPref(heroesListFromApi)
-            heroesList = heroesListFromApi?.toMutableList()
-            context.lifecycleScope.launch() {
-                Toast.makeText(context, "Shared Preferences обновлен!", Toast.LENGTH_LONG)
-                    .show()
+
+        } else {
+            updated = false
+            toastString = "Не удалось обновить: отсутствует подключение к интренету!"
+        }
+
+        if (userUpdate) {
+            context.lifecycleScope.launch()
+            {
+                Toast.makeText(context, toastString, Toast.LENGTH_LONG).show()
             }
         }
+        return updated
     }
 
     /**
@@ -154,6 +165,7 @@ class HeroesRepository(private val context: MainActivity) : Serializable {
         }
         first?.forEachIndexed { index, _ ->
             if (!first[index].equals(second?.get(index))) {
+                Log.d("---", "\n${first[index]}.\n ${second?.get(index)}")
                 return false
             }
         }

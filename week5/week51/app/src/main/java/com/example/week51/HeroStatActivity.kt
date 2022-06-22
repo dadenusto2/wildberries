@@ -74,17 +74,25 @@ class HeroStatActivity : AppCompatActivity() {
      * @param heroImgURL - сслыка для загрузки
      */
     fun loadImg(heroImgURL: String) {
-        val mHandler: Handler = Handler(Looper.getMainLooper())
+        val mHandler = Handler(Looper.getMainLooper())
         mHandler.post {
             ivImg.load(BASE_URL + heroImgURL)
             {
                 listener(
                     onError = { _, _ ->
-                        Toast.makeText(applicationContext, "Нет соеденения!", Toast.LENGTH_LONG)
-                            .show()
+                        Toast.makeText(
+                            this@HeroStatActivity,
+                            "Нет соеденения для загрузки фото!",
+                            Toast.LENGTH_LONG
+                        ).show()
                         swipeRefreshLayout.isRefreshing = false
                     },
                     onSuccess = { _, _ ->
+                        Toast.makeText(
+                            this@HeroStatActivity,
+                            "Фото из API!",
+                            Toast.LENGTH_LONG
+                        ).show()
                         swipeRefreshLayout.isRefreshing = false
                     }
                 )

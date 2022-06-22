@@ -51,10 +51,8 @@ class MainActivity : AppCompatActivity() {
             override fun afterTextChanged(s: Editable?) {
                 if (!etUsername.text.isEmpty()) {
                     curUser = etUsername.text.toString()
-                    Log.d("----", curUser)
                 } else {
                     curUser = BASE_USER
-                    Log.d("---+", curUser)
                 }
             }
 

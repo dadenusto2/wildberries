@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.widget.AdapterView
@@ -63,11 +64,9 @@ class MainActivity : AppCompatActivity() {
      * Запром на создание списка из файла или API
      */
     private suspend fun getResponse() {
-        var heroes: List<HeroData>? = mutableListOf()
-        lifecycleScope.launch {
-            heroes = heroesRepository.getHeroesList()
-        }.join()
+        val heroes = heroesRepository.getHeroesList()
         if (heroes?.size == 0) {
+            swipeRefreshLayout.isRefreshing = false
             return
         }
         val listView: ListView? = findViewById(R.id.lv_heroes)
@@ -78,7 +77,7 @@ class MainActivity : AppCompatActivity() {
         mHandler.post {
             listView?.adapter = adapter
             listView?.onItemClickListener =//для перехода к подробной статистике о герое
-                AdapterView.OnItemClickListener { parent, view, position, id ->
+                AdapterView.OnItemClickListener { _, _, position, _ ->
                     val intent = Intent(
                         this@MainActivity,
                         HeroStatActivity::class.java

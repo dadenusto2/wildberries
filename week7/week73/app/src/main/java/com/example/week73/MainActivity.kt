@@ -10,6 +10,7 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.example.week73.model.CatDataItem
 import com.example.week73.model.VoteData
@@ -107,44 +108,55 @@ class MainActivity : AppCompatActivity() {
      */
     private fun setCatImage(vote: Int) {
         val connectivity =
-            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
+            getSystemService(Context.CONNECTIVITY_SERVICE)
                     as ConnectivityManager
         val info = connectivity.activeNetwork
 
         if (info != null) {
             GlobalScope.launch(Dispatchers.IO) {
-                if (vote != -1) {//если надо проголосовать
-                    //данные для лайка
-                    val voteData = VoteData(catImageData?.get(0)?.id, curUser, vote)
-                    val client = HttpClient()
-                    //отправляем POST запрос
-                    client.post<Any> {
-                        body = TextContent(
-                            Json.encodeToString(voteData),
-                            contentType = ContentType.Application.Json
-                        )
-                        header("x-api-key", API_KEY)//api ключ
-                        url {
-                            protocol = URLProtocol.HTTPS
-                            host = "api.thecatapi.com"
-                            path(VOTES_URL)
+                try {
+                    //если надо проголосовать
+                    if (vote != -1) {
+                        val voteData = VoteData(catImageData?.get(0)?.id, curUser, vote)
+                        val client = HttpClient()
+                        client.post<Any> {//отправляем POST запрос
+                            body = TextContent(
+                                Json.encodeToString(voteData),
+                                contentType = ContentType.Application.Json
+                            )
+                            header("x-api-key", API_KEY)//api ключ
+                            url {
+                                protocol = URLProtocol.HTTPS
+                                host = "api.thecatapi.com"
+                                path(VOTES_URL)
+                            }
                         }
                     }
+
+                    //получаем случайного кота
+                    val clientGet = HttpClient()
+                    //строка с новым котом
+                    val jsonText = clientGet.get<String>(BASE_URL + SEARCH_URL)
+
+                    //получаем переменную с данными кота
+                    catImageData = Json.decodeFromString(jsonText)
+
+                    //задаем картинку
+                    val uri: Uri =
+                        Uri.parse(catImageData!![0].url)
+                    val draweeView = findViewById<View>(R.id.iv_favorite) as SimpleDraweeView
+                    draweeView.setImageURI(uri)
+                    draweeView.isClickable = false
+                } catch (e: Exception) {
+                    Toast.makeText(this@MainActivity, "Нет соединения!", Toast.LENGTH_SHORT)
+                        .show()
                 }
-                val clientGet = HttpClient()
-                //получаем случайного кота
-                val jsonText = clientGet.get<String>(BASE_URL + SEARCH_URL)
-
-                //получаем пременную с данными кота
-                catImageData = Json.decodeFromString(jsonText)
-
-                //задаем картинку
-                val uri: Uri =
-                    Uri.parse(catImageData!![0].url)
-                val draweeView = findViewById<View>(R.id.iv_favorite) as SimpleDraweeView
-                draweeView.setImageURI(uri)
-                draweeView.isClickable = false
             }
+        }
+        else{
+            Toast.makeText(this, "Нет соединения!", Toast.LENGTH_SHORT)
+                .show()
+
         }
     }
 }

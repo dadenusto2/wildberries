@@ -1,10 +1,8 @@
 package com.example.week82
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
-import android.net.ConnectivityManager
 import android.util.Log
 import android.widget.Toast
 import androidx.fragment.app.FragmentActivity
@@ -35,7 +33,6 @@ class HeroesRepository(private val context: FragmentActivity) : Serializable {
      * @return список героев
      */
     suspend fun getHeroesList(): List<HeroData>? {
-        val job: Job
         heroesList = mutableListOf()
         var heroesFromPreferences: List<HeroData>? = listOf()
         var heroesFromAPI: List<HeroData>? = listOf()
@@ -47,32 +44,22 @@ class HeroesRepository(private val context: FragmentActivity) : Serializable {
         jobGet.start()
         jobGet.join()
 
+        val toastString: String
+
         //если не пустой, то из него
         if (heroesFromPreferences?.isNotEmpty() == true) {
-            job = GlobalScope.launch {
-                heroesList = heroesFromPreferences
-            }
-            context.lifecycleScope.launch {
-                Toast.makeText(context, "Данные из Shared Preferences!", Toast.LENGTH_LONG)
-                    .show()
-            }
+            heroesList = heroesFromPreferences
+            toastString = "Данные из Shared Preferences!"
+
         } else if (heroesFromAPI?.size!! > 0) { // иначе из API
-            job = GlobalScope.launch {
-                heroesList = getHeroesFromAPI()
-            }
-            context.lifecycleScope.launch {
-                Toast.makeText(context, "Данные из API!", Toast.LENGTH_LONG)
-                    .show()
-            }
+            heroesList = heroesFromAPI
+            toastString = "Данные из API!"
+
         } else {
-            job = context.lifecycleScope.launch {
-                Toast.makeText(context, "Нет подходящих данных!", Toast.LENGTH_LONG)
-                    .show()
-            }
+            toastString = "Нет подходящих данных!"
         }
-        job.start()
-        job.join()
-        //context.swipeRefreshLayout.isRefreshing = false
+        Toast.makeText(context, toastString, Toast.LENGTH_LONG)
+            .show()
         return heroesList
     }
 
@@ -103,33 +90,33 @@ class HeroesRepository(private val context: FragmentActivity) : Serializable {
      */
     @SuppressLint("CommitPrefEdits")
     fun getHeroesFromAPI(): List<HeroData>? {
-        val connectivity: ConnectivityManager =
-            context.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                    as ConnectivityManager
-        val info = connectivity.activeNetwork
-        if (info != null) {
-            var heroListFromApi: List<HeroData>? = mutableListOf()
-            val gson = GsonBuilder()
-                .setLenient()
-                .create()
-            //создаем запрос
-            val retrofit = Retrofit.Builder()
-                .baseUrl(BASE_URL)
-                .addConverterFactory(GsonConverterFactory.create(gson))
-                .build()
+        var heroListFromApi: List<HeroData>? = mutableListOf()
+        val gson = GsonBuilder()
+            .setLenient()
+            .create()
+        //создаем запрос
+        val retrofit = Retrofit.Builder()
+            .baseUrl(BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
 
-            //указываем класс для класс интерфеса для запрроса
-            val service = retrofit.create(RetrofitService::class.java)
-            val call: Call<List<HeroData>> = service.heroesData
-            //делаем запрос
+        //указываем класс для класс интерфеса для запрроса
+        val service = retrofit.create(RetrofitService::class.java)
+        val call: Call<List<HeroData>> = service.heroesData
+        //делаем запрос
+        try {
             val response = call.execute()
             writeHeroesToPref(response.body())
             heroListFromApi = response.body()
-            Log.d("---", heroListFromApi?.size.toString())
-            return heroListFromApi
-        } else
-            return mutableListOf()
+        } catch (e: Exception) {
+            context.lifecycleScope.launch {
+                Toast.makeText(context, "Нет соединения!", Toast.LENGTH_LONG)
+                    .show()
+            }
+        }
+        return heroListFromApi
     }
+
 
     /**
      * Обновлем список героев в Shared Preferences
@@ -178,7 +165,7 @@ class HeroesRepository(private val context: FragmentActivity) : Serializable {
             return false
         }
         first?.forEachIndexed { index, _ ->
-            if (first[index].equals(second?.get(index))) {
+            if (!first[index].equals(second?.get(index))) {
                 Log.d("---", "\n${first[index]}.\n ${second?.get(index)}")
                 return false
             }

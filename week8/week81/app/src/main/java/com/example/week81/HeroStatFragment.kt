@@ -48,8 +48,6 @@ class HeroStatFragment : Fragment() {
     @SuppressLint("InflateParams")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        /*val bundle = intent.extras
-        val heroData = bundle?.getSerializable("HeroData") as HeroData*/
 
         val heroImgURL = heroData.img
 
@@ -104,13 +102,21 @@ class HeroStatFragment : Fragment() {
         val fullPath = BASE_URL + heroImgURL
         ivImg.load(fullPath)
         {
-            listener(//если ошибка
+            listener(
                 onError = { _, _ ->
-                    /*Toast.makeText(applicationContext, "Нет соеденения!", Toast.LENGTH_LONG)
-                        .show()*/
+                    Toast.makeText(
+                        activity,
+                        "Нет соеденения для загрузки фото!",
+                        Toast.LENGTH_LONG
+                    ).show()
                     swipeRefreshLayout.isRefreshing = false
                 },
                 onSuccess = { _, _ ->
+                    Toast.makeText(
+                        activity,
+                        "Фото из API!",
+                        Toast.LENGTH_LONG
+                    ).show()
                     swipeRefreshLayout.isRefreshing = false
                 }
             )

@@ -2,6 +2,7 @@ package com.example.week81
 
 import android.content.Context
 import android.net.ConnectivityManager
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.example.week81.model.HeroData
@@ -71,11 +72,11 @@ class HeroesRepository(private val activity: MainActivity) {
      * @return список героев
      */
     suspend fun getHeroesList(): List<HeroData>? {
+        Log.d("---", "getHeroesList")
         val file = File(PATH)
         var job: Job = Job()
-        // получаем героев из файла
 
-        val toastString: String//строка для toast
+        val toastString: String
 
         var heroesListFromFile: List<HeroData>? = listOf()
         var heroesListFromApi: List<HeroData>? = listOf()
@@ -87,26 +88,28 @@ class HeroesRepository(private val activity: MainActivity) {
         jobGet.start()
         jobGet.join()
 
+        Log.d("---", "end get from")
         //если не пустой, то из него
         if (file.isFile && !heroesListFromFile.isNullOrEmpty()) {
-            toastString = "Данные из файла!"
             //получаем список из полученной json строки
+            toastString = "Данные из файла!"
             job = GlobalScope.launch {
                 heroesList = heroesListFromFile
             }
-        } else if (!heroesListFromApi.isNullOrEmpty()) {// иначе из API
+            job.start()
+        } else if (!heroesListFromApi.isNullOrEmpty()) {// иначе пытаемся из API
             toastString = "Данные из API!"
             job = GlobalScope.launch {
                 heroesList = heroesListFromApi
-                writeHeroesToFile(heroesList)//обновляем файл
+                writeHeroesToFile(heroesList)//обновляем
             }
-        } else
+            job.start()
+        } else //иначе пустой список
             toastString = "Нет подходящих данных!"
 
         Toast.makeText(activity, toastString, Toast.LENGTH_LONG)
             .show()
-        job.start()
-        job.join()
+        Log.d("---", toastString)
         return heroesList
     }
 
@@ -117,11 +120,7 @@ class HeroesRepository(private val activity: MainActivity) {
      */
     private fun getHeroesFromAPI(): List<HeroData>? {
         var heroesListFromCallback: List<HeroData>? = mutableListOf()
-        val connectivity: ConnectivityManager =
-            activity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                    as ConnectivityManager
-        val info = connectivity.activeNetwork
-        if (info != null) {
+        try {
             client = OkHttpClient()
             // Объект request с url адресом
             request = Request.Builder()
@@ -140,8 +139,11 @@ class HeroesRepository(private val activity: MainActivity) {
             heroesListFromCallback = response.body?.string()?.let {
                 jsonAdapter.fromJson(it)
             }
+
+            return heroesListFromCallback
+        } catch (e: Exception) {//если ошибка подключения
+            return mutableListOf()
         }
-        return heroesListFromCallback
     }
 
     /**

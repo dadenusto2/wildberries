@@ -1,7 +1,6 @@
 package com.example.week71
 
-import android.content.Context
-import android.net.ConnectivityManager
+import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
 import com.squareup.moshi.JsonAdapter
@@ -92,19 +91,19 @@ class HeroesRepository(private val activity: MainActivity) {
             job = GlobalScope.launch {
                 heroesList = heroesListFromFile
             }
+            job.start()
         } else if (!heroesListFromApi.isNullOrEmpty()) {// иначе пытаемся из API
             toastString = "Данные из API!"
             job = GlobalScope.launch {
                 heroesList = heroesListFromApi
                 writeHeroesToFile(heroesList)//обновляем
             }
-        } else //инач пустой список
+            job.start()
+        } else //иначe пустой список
             toastString = "Нет подходящих данных!"
 
         Toast.makeText(activity, toastString, Toast.LENGTH_LONG)
             .show()
-        job.start()
-        job.join()
         return heroesList
     }
 
@@ -114,12 +113,8 @@ class HeroesRepository(private val activity: MainActivity) {
      * @return список героев из API
      */
     private fun getHeroesFromAPI(): List<HeroData>? {
-        var heroesListFromCallback: List<HeroData>? = mutableListOf()
-        val connectivity: ConnectivityManager =
-            activity.applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                    as ConnectivityManager
-        val info = connectivity.activeNetwork
-        if (info != null) {
+        var heroesListFromCallback: List<HeroData>?
+        try {
             client = OkHttpClient()
             // Объект request с url адресом
             request = Request.Builder()
@@ -138,8 +133,10 @@ class HeroesRepository(private val activity: MainActivity) {
             heroesListFromCallback = response.body?.string()?.let {
                 jsonAdapter.fromJson(it)
             }
+            return heroesListFromCallback
+        } catch (e: Exception) {//если ошибка подключения
+            return mutableListOf()
         }
-        return heroesListFromCallback
     }
 
     /**
@@ -164,7 +161,7 @@ class HeroesRepository(private val activity: MainActivity) {
             val inputStream: InputStream = file.inputStream()
             // получаем строку json из файл
             val inputString = inputStream.bufferedReader().use { it.readText() }
-            return if (inputString.length > 1) {
+            return if (inputString.isNotEmpty()) {
                 //получаем список из полученной json строку
                 heroesListFromFile = inputString.let { jsonAdapter.fromJson(it) }
                 heroesListFromFile

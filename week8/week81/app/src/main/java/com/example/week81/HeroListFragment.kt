@@ -14,6 +14,7 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.week81.model.HeroData
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.launch
 import okhttp3.OkHttpClient
 import okhttp3.Request
@@ -69,10 +70,13 @@ class HeroListFragment : Fragment() {
      */
     suspend fun getResponse() {
         var heroes: List<HeroData>? = mutableListOf()
-        lifecycleScope.launch {
+        val job: Job = lifecycleScope.launch {
             heroes = (activity as MainActivity).heroesRepository.getHeroesList()
-        }.join()
+        }
+        job.start()
+        job.join()
         if (heroes?.size == 0) {
+            swipeRefreshLayout.isRefreshing = false
             return
         }
         val listView: ListView? = myFragmentView.findViewById(R.id.lv_heroes)

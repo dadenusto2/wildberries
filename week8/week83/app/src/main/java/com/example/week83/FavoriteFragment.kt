@@ -122,36 +122,35 @@ class FavoriteFragment : Fragment() {
      *  Получаем ссылки на фото лайкнутых котов
      */
     @SuppressLint("HandlerLeak")
-    private fun getFavoriteCats() {
-        if (recyclerView.isEmpty()) {//если пустое
-            if (!isShowing) {
-                isShowing = true
-                mHandler.sendEmptyMessage(1)
-            }
-            //задаем окно загрузки
-            var images = mutableListOf<FavoritesUrl?>()
-            val job: Job = GlobalScope.launch(Dispatchers.IO) {
-                val favoriteRepository = FavoriteRepository()
-                // получаем ссылки на картинки лайкнутых котов
-                images = favoriteRepository.getFavoriteCats(
-                    curUser,
-                    myDatabase,
-                    activity
-                )
-            }
-            GlobalScope.launch {
-                job.start()
-                job.join()
-                mHandler.post {
-                    //задаем адаптер
-                    imageGalleryAdapter = ImageGalleryAdapter(images)
-                    recyclerView.adapter = imageGalleryAdapter
-                    mHandler.sendEmptyMessage(0)
-                    isShowing = false
-                }
-            }
-            swipeRefreshLayout.isRefreshing = false
+    private fun getFavoriteCats() {//если пустое
+        if (!isShowing) {
+            isShowing = true
+            mHandler.sendEmptyMessage(1)
         }
+        //задаем окно загрузки
+        var images = mutableListOf<FavoritesUrl?>()
+        val job: Job = GlobalScope.launch(Dispatchers.IO) {
+            val favoriteRepository = FavoriteRepository()
+            // получаем ссылки на картинки лайкнутых котов
+            images = favoriteRepository.getFavoriteCats(
+                curUser,
+                myDatabase,
+                activity
+            )
+        }
+        GlobalScope.launch {
+            // получаем котов
+            job.start()
+            job.join()
+            //задаем адаптер
+            mHandler.post {
+                imageGalleryAdapter = ImageGalleryAdapter(images)
+                recyclerView.adapter = imageGalleryAdapter
+                mHandler.sendEmptyMessage(0)
+                isShowing = false
+            }
+        }
+        swipeRefreshLayout.isRefreshing = false
     }
 
     /**

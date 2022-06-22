@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Work  implements Serializable {
 
@@ -31,4 +32,16 @@ public class Work  implements Serializable {
         this.base = base;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Work)) return false;
+        Work work = (Work) o;
+        return Objects.equals(getOccupation(), work.getOccupation()) && Objects.equals(getBase(), work.getBase());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getOccupation(), getBase());
+    }
 }

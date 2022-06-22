@@ -41,7 +41,6 @@ class HeroListFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         heroViewModel = ViewModelProvider(activity!!).get(HeroViewModel::class.java)
-        // = (activity as MainActivity).heroesRepository(activity!!)
 
         GlobalScope.launch {
             getResponse()
@@ -67,6 +66,10 @@ class HeroListFragment : Fragment() {
         }
         job.start()
         job.join()
+        if (heroesList?.size == 0) {
+            swipeRefreshLayout.isRefreshing = false
+            return
+        }
         setList(heroesList)
         swipeRefreshLayout.isRefreshing = false
     }

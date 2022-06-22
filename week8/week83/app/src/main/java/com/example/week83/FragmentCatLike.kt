@@ -12,8 +12,10 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
+import android.widget.Toast
 import androidx.core.os.bundleOf
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import com.example.week83.model.CatDataItem
 import com.example.week83.model.VoteData
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -161,8 +163,14 @@ class FragmentCatLike : Fragment() {
                     draweeView.setImageURI(uri)
                     draweeView.isClickable = false
                 } catch (e: Exception) {
+                    Toast.makeText(context, "Нет соединения!", Toast.LENGTH_SHORT)
+                    .show()
                 }
             }
+        }
+        else{
+            Toast.makeText(context, "Нет соединения!", Toast.LENGTH_SHORT)
+                .show()
 
         }
     }

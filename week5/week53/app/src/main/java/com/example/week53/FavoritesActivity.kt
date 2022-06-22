@@ -60,9 +60,6 @@ class FavoritesActivity : AppCompatActivity() {
                 getFavoriteCats()
             }
         }
-        GlobalScope.launch(Dispatchers.IO) {
-            getFavoriteCats()
-        }
 
         var loading: AlertDialog? = null
         mHandler = @SuppressLint("HandlerLeak")
@@ -86,6 +83,10 @@ class FavoritesActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+
+        GlobalScope.launch(Dispatchers.IO) {
+            getFavoriteCats()
         }
     }
 
@@ -139,7 +140,6 @@ class FavoritesActivity : AppCompatActivity() {
                 mHandler.sendEmptyMessage(0)
                 isShowing = false
             }
-
         }
         job.start()
         job.join()

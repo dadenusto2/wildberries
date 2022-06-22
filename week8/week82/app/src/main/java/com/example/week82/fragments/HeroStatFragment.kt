@@ -7,12 +7,14 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.week82.model.HeroViewModel
-import com.example.week82.model.HeroData
 import com.example.week82.R
+import com.example.week82.model.HeroData
+import com.example.week82.model.HeroViewModel
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlin.reflect.full.memberProperties
@@ -51,7 +53,8 @@ class HeroStatFragment : Fragment() {
 
         var heroData = HeroData()
         val model = ViewModelProvider(activity!!).get(HeroViewModel::class.java)
-        model.heroData.observe(activity!!
+        model.heroData.observe(
+            activity!!
         ) { o -> heroData = o as HeroData }
         //задаем фото
         loadImg(heroData)
@@ -107,7 +110,23 @@ class HeroStatFragment : Fragment() {
     fun loadImg(heroData: HeroData) {
         Picasso.with(activity)
             .load(heroData.images.lg)
-            .into(ivImg)
+            .into(ivImg, object : Callback {
+                override fun onSuccess() {
+                    Toast.makeText(
+                        activity,
+                        "Фото из API!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                override fun onError() {
+                    Toast.makeText(
+                        activity,
+                        "Нет соеденения для загрузки фото!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
 
         swipeRefreshLayout.isRefreshing = false
     }

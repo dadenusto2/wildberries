@@ -6,9 +6,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.week52.Model.HeroData
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -83,7 +85,23 @@ class HeroStatActivity : AppCompatActivity() {
     fun loadImg(heroData: HeroData) {
         Picasso.with(this)
             .load(heroData.images.lg)
-            .into(ivImg)
+            .into(ivImg, object : Callback {
+                override fun onSuccess() {
+                    Toast.makeText(
+                        this@HeroStatActivity,
+                        "Фото из API!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+
+                override fun onError() {
+                    Toast.makeText(
+                        this@HeroStatActivity,
+                        "Нет соеденения для загрузки фото!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
         swipeRefreshLayout.isRefreshing = false
     }
 }

@@ -6,9 +6,11 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import com.example.week72.model.HeroData
+import com.squareup.picasso.Callback
 import com.squareup.picasso.Picasso
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
@@ -20,7 +22,7 @@ class HeroStatActivity : AppCompatActivity() {
     @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.acrivity_hero_characteristics)
+        setContentView(R.layout.activity_hero_characteristics)
         val layout = findViewById<LinearLayout>(R.id.lv_stat_list)
         val heroName = layoutInflater.inflate(R.layout.hero_charact_item, null) as ViewGroup
         val tvHeroName = heroName.findViewById<TextView>(R.id.tv_stat_name)
@@ -84,8 +86,23 @@ class HeroStatActivity : AppCompatActivity() {
     fun loadImg(heroData: HeroData) {
         Picasso.with(this)
             .load(heroData.images.lg)
-            .into(ivImg)
+            .into(ivImg, object : Callback {
+                override fun onSuccess() {
+                    Toast.makeText(
+                        this@HeroStatActivity,
+                        "Фото из API!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
 
+                override fun onError() {
+                    Toast.makeText(
+                        this@HeroStatActivity,
+                        "Нет соеденения для загрузки фото!",
+                        Toast.LENGTH_LONG
+                    ).show()
+                }
+            })
         swipeRefreshLayout.isRefreshing = false
     }
 }

@@ -5,6 +5,7 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
+import java.util.Objects;
 
 public class Powerstats implements Serializable {
 
@@ -75,4 +76,16 @@ public class Powerstats implements Serializable {
         this.combat = combat;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Powerstats)) return false;
+        Powerstats that = (Powerstats) o;
+        return Objects.equals(getIntelligence(), that.getIntelligence()) && Objects.equals(getStrength(), that.getStrength()) && Objects.equals(getSpeed(), that.getSpeed()) && Objects.equals(getDurability(), that.getDurability()) && Objects.equals(getPower(), that.getPower()) && Objects.equals(getCombat(), that.getCombat());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getIntelligence(), getStrength(), getSpeed(), getDurability(), getPower(), getCombat());
+    }
 }

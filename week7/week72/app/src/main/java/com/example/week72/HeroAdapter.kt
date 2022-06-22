@@ -8,14 +8,13 @@ import android.view.ViewGroup
 import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
-import com.example.week72.Model.HeroData
+import com.example.week72.model.HeroData
 import com.squareup.picasso.Picasso
 import kotlinx.coroutines.DelicateCoroutinesApi
 
-
-val PATH_ICON = "/data/data/com.example.week72/images/icons/"
-
-//адаптер списка героев
+/**
+ * Адаптер списка героев
+ */
 @DelicateCoroutinesApi
 class HeroAdapter(private var activity: MainActivity, private var heroesList: List<HeroData>?) :
     BaseAdapter() {
@@ -42,8 +41,6 @@ class HeroAdapter(private var activity: MainActivity, private var heroesList: Li
         }
     }
 
-    //задаем огтображение списка героев
-    @OptIn(DelicateCoroutinesApi::class)
     @SuppressLint("InflateParams")
     override fun getView(p0: Int, p1: View?, p2: ViewGroup?): View {
         val view: View?
@@ -62,42 +59,20 @@ class HeroAdapter(private var activity: MainActivity, private var heroesList: Li
 
         viewHolder.tvName?.text = curHero!!.name
 
-        getImageView(viewHolder.ivIcon, curHero)
+        setImageView(viewHolder.ivIcon, curHero)
 
         return view as View
     }
 
-    fun getImageView(imageView: ImageView?, curHero: HeroData?) {
-
+    /**
+     * Загрузка изображения через picasso
+     *
+     * @param imageView - изображение
+     * @param curHero - данные героя для загрузки
+     */
+    fun setImageView(imageView: ImageView?, curHero: HeroData?) {
         Picasso.with(activity)
             .load(curHero?.images?.xs)
             .into(imageView)
-        /*val imageRepository = ImageRepository()
-        val fullPath = curHero?.images?.xs
-        val fullName = fullPath?.substringAfterLast("/")
-        val pathToIcon = imageRepository.readImageFromPref(activity,
-            "icon_$fullName")
-
-        val file = File(pathToIcon)
-
-        if (file.isFile) {
-            Picasso.with(activity)
-                .load(curHero?.images?.xs)
-                .into(imageView)
-            Log.d("---", "icon_$fullName from file")
-        } else {
-            //GlobalScope.launch {
-                imageRepository.saveIcon(activity,
-                    curHero,
-                    "icon_$fullName",
-                    PATH_ICON)
-            //}
-
-            Log.d("---","${PATH_ICON}icon_$fullName")
-            Picasso.with(activity)
-                .load(fullPath)
-                .into(imageView)
-            Log.d("---", "icon_$fullName from API")
-        }*/
     }
 }

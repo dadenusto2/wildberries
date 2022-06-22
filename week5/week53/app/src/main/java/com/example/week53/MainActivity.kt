@@ -2,8 +2,8 @@ package com.example.week53
 
 import android.content.Context
 import android.content.Intent
-import android.content.IntentFilter
-import android.net.*
+import android.net.ConnectivityManager
+import android.net.Uri
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
@@ -12,35 +12,21 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.week53.model.CatDataItem
+import com.example.week53.model.VoteData
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.view.SimpleDraweeView
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.content.*
 import io.ktor.http.*
-import kotlinx.android.synthetic.main.favorite_item.view.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
-import kotlinx.serialization.SerialName
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-
-
-@Serializable
-data class VoteData(
-    @SerialName("image_id")val imageId: String? = null,
-    @SerialName("sub_id")val subId: String? = null,
-    val value: Int? = null
-)
-
-@Serializable
-data class Data(val a: Int, val b: String)
 
 const val BASE_URL = "https://api.thecatapi.com/v1"
 const val SEARCH_URL = "/images/search"
@@ -62,22 +48,24 @@ class MainActivity : AppCompatActivity() {
 
         //изменения пользователя
         etUsername.addTextChangedListener(object : TextWatcher {
-                override fun afterTextChanged(s: Editable?) {
-                    if(!etUsername.text.isEmpty()){
-                        curUser = etUsername.text.toString()
-                        Log.d("----", curUser)
-                    }
-                    else{
-                        curUser = BASE_USER
-                        Log.d("---+", curUser)
-                    }
+            override fun afterTextChanged(s: Editable?) {
+                if (!etUsername.text.isEmpty()) {
+                    curUser = etUsername.text.toString()
+                    Log.d("----", curUser)
+                } else {
+                    curUser = BASE_USER
+                    Log.d("---+", curUser)
                 }
-                override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
-                }
-                override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
-                }
-            })
+            }
 
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {
+            }
+
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+            }
+        })
+
+        //задаем картинку кота
         setCatImage(-1)
 
         val draweeView = findViewById<View>(R.id.iv_favorite) as SimpleDraweeView
@@ -87,29 +75,33 @@ class MainActivity : AppCompatActivity() {
 
         //кнопка для лайка
         val ibLike = findViewById<ImageButton>(R.id.ib_like)
-        ibLike.setOnClickListener{
-            setCatImage( 1)
+        ibLike.setOnClickListener {
+            setCatImage(1)
         }
 
-        //кнопка для дислайка
+        //кнопка для дизлайка
         val ibDislike = findViewById<ImageButton>(R.id.ib_dislike)
-        ibDislike.setOnClickListener{
-            setCatImage( 0)
+        ibDislike.setOnClickListener {
+            setCatImage(0)
         }
 
-        //избраное
+        //избранное
         val btnFavorite: Button = findViewById(R.id.btn_favorite)
-        btnFavorite.setOnClickListener(){
+        btnFavorite.setOnClickListener() {
             val intent = Intent(
                 this,
-                FavoritesActivity::class.java)
+                FavoritesActivity::class.java
+            )
             intent.putExtra("username", curUser)
             startActivity(intent)
         }
     }
 
-
-    //получить кота
+    /**
+     * Получаем изображение кота
+     *
+     * @param vote - какая оценка 1-лайк, 0-диздайк, -1-ничего
+     */
     fun setCatImage(vote: Int) {
         val connectivity =
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)

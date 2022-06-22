@@ -4,7 +4,6 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
-import android.view.Window
 import android.widget.AdapterView
 import android.widget.ListView
 import android.widget.Toast
@@ -19,11 +18,13 @@ import java.io.Serializable
 
 const val BASE_URL = "https://api.opendota.com"
 const val HERO_STATS = "api/heroStats"
+
 class MainActivity : AppCompatActivity() {
     private lateinit var mHandler: Handler
     private lateinit var client: OkHttpClient
     private lateinit var request: Request
-    private lateinit var swipeRefreshLayout : SwipeRefreshLayout
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -40,14 +41,18 @@ class MainActivity : AppCompatActivity() {
             getResponse()
         }
     }
-    fun getResponse(){
+    /**
+     * Запрос на создание списка из API
+     */
+    fun getResponse() {
         mHandler = Handler(Looper.getMainLooper())
         //делаем запрос и получаем ответ
         client.newCall(request).enqueue(object : Callback {
             override fun onFailure(call: Call, e: IOException) {//если неудачно
                 mHandler.post {
                     Toast.makeText(applicationContext, "Нет соеденения!", Toast.LENGTH_LONG).show()
-                    swipeRefreshLayout.isRefreshing = false}
+                    swipeRefreshLayout.isRefreshing = false
+                }
                 e.printStackTrace()
             }
 
@@ -77,6 +82,9 @@ class MainActivity : AppCompatActivity() {
                             startActivity(intent)
                         }
                     adapter.notifyDataSetChanged()
+                    swipeRefreshLayout.isRefreshing = false
+
+                    Toast.makeText(applicationContext, "Загруженно из API!", Toast.LENGTH_LONG).show()
                     swipeRefreshLayout.isRefreshing = false
                 }
             }

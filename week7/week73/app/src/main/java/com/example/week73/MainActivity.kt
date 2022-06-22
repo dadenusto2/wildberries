@@ -6,19 +6,20 @@ import android.net.*
 import android.os.Bundle
 import android.text.Editable
 import android.text.TextWatcher
-import android.util.Log
 import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.ImageButton
 import androidx.appcompat.app.AppCompatActivity
+import com.example.week73.model.CatDataItem
+import com.example.week73.model.VoteData
 import com.facebook.drawee.backends.pipeline.Fresco
 import com.facebook.drawee.view.SimpleDraweeView
 import io.ktor.client.*
 import io.ktor.client.request.*
 import io.ktor.content.*
 import io.ktor.http.*
-import kotlinx.android.synthetic.main.favorite_item.view.*
+import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.launch
@@ -28,28 +29,24 @@ import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 
-
-@Serializable
-data class VoteData(
-    @SerialName("image_id") val imageId: String? = null,
-    @SerialName("sub_id") val subId: String? = null,
-    val value: Int? = null
-)
-
 const val BASE_URL = "https://api.thecatapi.com/v1"
 const val SEARCH_URL = "/images/search"
 const val API_KEY = "bcaeec60-01cd-4050-aa32-431a6e6a064b"
 const val BASE_USER = "test"
 
+/**
+ * Оценка котов
+ */
+@DelicateCoroutinesApi
 class MainActivity : AppCompatActivity() {
-    var catImageData: List<CatDataItem>? = null
+    private var catImageData: List<CatDataItem>? = null
     lateinit var curUser: String
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         Fresco.initialize(this)//задаем fresco
         setContentView(R.layout.activity_main)
 
-        //ользователь по умолчанию
+        //пользователь по умолчанию
         curUser = BASE_USER
         val etUsername = findViewById<EditText>(R.id.et_username)
         etUsername.setText(curUser)
@@ -57,10 +54,10 @@ class MainActivity : AppCompatActivity() {
         //изменения пользователя
         etUsername.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(s: Editable?) {
-                if (!etUsername.text.isEmpty()) {
-                    curUser = etUsername.text.toString()
+                curUser = if (etUsername.text.isNotEmpty()) {
+                    etUsername.text.toString()
                 } else {
-                    curUser = BASE_USER
+                    BASE_USER
                 }
             }
 
@@ -71,6 +68,7 @@ class MainActivity : AppCompatActivity() {
             }
         })
 
+        //задаем картинку кота
         setCatImage(-1)
 
         val draweeView = findViewById<View>(R.id.iv_favorite) as SimpleDraweeView
@@ -84,13 +82,13 @@ class MainActivity : AppCompatActivity() {
             setCatImage(1)
         }
 
-        //кнопка для дислайка
+        //кнопка для дизлайка
         val ibDislike = findViewById<ImageButton>(R.id.ib_dislike)
         ibDislike.setOnClickListener {
             setCatImage(0)
         }
 
-        //избраное
+        //избранное
         val btnFavorite: Button = findViewById(R.id.btn_favorite)
         btnFavorite.setOnClickListener() {
             val intent = Intent(
@@ -102,9 +100,12 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-
-    //получить кота
-    fun setCatImage(vote: Int) {
+    /**
+     * Получаем изображение кота
+     *
+     * @param vote - какая оценка 1-лайк, 0-диздайк, -1-ничего
+     */
+    private fun setCatImage(vote: Int) {
         val connectivity =
             applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
                     as ConnectivityManager
@@ -113,9 +114,11 @@ class MainActivity : AppCompatActivity() {
         if (info != null) {
             GlobalScope.launch(Dispatchers.IO) {
                 if (vote != -1) {//если надо проголосовать
+                    //данные для лайка
                     val voteData = VoteData(catImageData?.get(0)?.id, curUser, vote)
                     val client = HttpClient()
-                    client.post<Any> {//отправляем POST запрос
+                    //отправляем POST запрос
+                    client.post<Any> {
                         body = TextContent(
                             Json.encodeToString(voteData),
                             contentType = ContentType.Application.Json

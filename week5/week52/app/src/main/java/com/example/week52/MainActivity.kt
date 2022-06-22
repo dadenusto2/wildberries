@@ -20,8 +20,12 @@ import retrofit2.http.GET
 import java.io.Serializable
 
 const val BASE_URL = "https://cdn.jsdelivr.net/gh/akabab/superhero-api@0.3.0/api/"
+
+/**
+ * Список героев
+ */
 class MainActivity : AppCompatActivity() {
-    lateinit var swipeRefreshLayout : SwipeRefreshLayout
+    lateinit var swipeRefreshLayout: SwipeRefreshLayout
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -29,30 +33,20 @@ class MainActivity : AppCompatActivity() {
         getResponse()
 
         //задаем обновление на swipe to refresh
-        swipeRefreshLayout  = findViewById(R.id.sfl_heroes)
+        swipeRefreshLayout = findViewById(R.id.sfl_heroes)
         swipeRefreshLayout.setOnRefreshListener {
             getResponse()
         }
     }
 
-    override fun onSaveInstanceState(outState: Bundle) {
-        super.onSaveInstanceState(outState)
-    }
-
-    override fun onRestoreInstanceState(savedInstanceState: Bundle) {
-        super.onRestoreInstanceState(savedInstanceState)
-    }
-
-    interface RetrofitService{//интерфейс для
-        @get:GET("all.json")
-        val heroesData: Call<List<HeroData>>
-    }
-
-    fun getResponse(){
+    /**
+     * Делаем запром на создание списка из Shared Preferences или API
+     */
+    fun getResponse() {
         //задаем gson для конвертации
         val gson = GsonBuilder()
-        .setLenient()
-        .create()
+            .setLenient()
+            .create()
 
         //создаем запрос
         val retrofit = Retrofit.Builder()
@@ -66,13 +60,19 @@ class MainActivity : AppCompatActivity() {
         //делаем запрос
         call.enqueue(object : Callback<List<HeroData>?> {
             // при получении списока героев передаем их в адаптер для создания списка
-            override fun onResponse(call: Call<List<HeroData>?>, response: Response<List<HeroData>?>) {
+            override fun onResponse(
+                call: Call<List<HeroData>?>,
+                response: Response<List<HeroData>?>
+            ) {
                 if (response.isSuccessful()) {
                     if (response.body() != null) {
                         setList(response.body())
+                        Toast.makeText(this@MainActivity, "Данные из API", Toast.LENGTH_LONG)
+                            .show()
                     }
                 }
             }
+
             override fun onFailure(call: Call<List<HeroData>?>, t: Throwable) {
                 Toast.makeText(this@MainActivity, "Нет соединения!", Toast.LENGTH_LONG)
                     .show()
@@ -81,8 +81,12 @@ class MainActivity : AppCompatActivity() {
         })
     }
 
-    // создание списка героев
-    fun setList(heroesList :List<HeroData>?) {
+    /**
+     * Задаем списка
+     *
+     * @param heroesList - список
+     */
+    fun setList(heroesList: List<HeroData>?) {
         val listView: ListView? = findViewById(R.id.lv_heroes)
         //создаем адаптер
         val adapter = HeroAdapter(this@MainActivity, heroesList)
@@ -103,4 +107,10 @@ class MainActivity : AppCompatActivity() {
                 }
         }
     }
+}
+
+interface RetrofitService {
+    //интерфейс для
+    @get:GET("all.json")
+    val heroesData: Call<List<HeroData>>
 }

@@ -10,11 +10,13 @@ import android.view.ViewGroup
 import android.widget.Chronometer
 import android.widget.ImageButton
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
+import kotlinx.coroutines.launch
 import java.util.*
-import kotlinx.coroutines.*
-import androidx.lifecycle.*
 
-// фрагмент таймера, остановки/запуска и сброса
+/**
+ * фрагмент таймера, остановки/запуска и сброса
+ */
 class FragmentTimer : Fragment() {
     lateinit var chronometer: Chronometer//для вывода времени рабрты
     private var fragmentSendDataListener: OnFragmentSendDataListener? = null
@@ -36,7 +38,7 @@ class FragmentTimer : Fragment() {
             //время в секундах
             val elapsedMillis: Long = (SystemClock.elapsedRealtime() - chronometer.base)
             //если делится на 20 и не нулевая секунда
-            if ((elapsedMillis/1000 % 20).toDouble() == 0.0 && elapsedMillis>1000) {
+            if ((elapsedMillis / 1000 % 20).toDouble() == 0.0 && elapsedMillis > 1000) {
                 changeColor()//меняем цвет
             }
         }
@@ -47,7 +49,7 @@ class FragmentTimer : Fragment() {
         ibPlay.setOnClickListener {
             // меням состояние и возвращаем текущее
             val b = fragmentSendDataListener!!.changeGenerateStatus()
-            if(b)
+            if (b)
                 ibPlay.setImageResource(android.R.drawable.ic_media_pause)
             else
                 ibPlay.setImageResource(android.R.drawable.ic_media_play)
@@ -57,7 +59,11 @@ class FragmentTimer : Fragment() {
             fragmentSendDataListener!!.resetNumber()
         }
     }
-    private fun changeColor(){
+
+    /**
+     * Изменение цвета фона
+     */
+    private fun changeColor() {
         lifecycleScope.launch {
             val rnd = Random()
             // генерируем случайный цвет для фона
@@ -74,13 +80,9 @@ class FragmentTimer : Fragment() {
             view?.setBackgroundColor(color)//меняем цвет фона
         }
     }
+
     override fun onPause() {
         ibPlay.setImageResource(android.R.drawable.ic_media_play)
         super.onPause()
     }
-}
-//интерфес для остановки/ запуска и сброса
-interface OnFragmentSendDataListener {
-    fun changeGenerateStatus():Boolean
-    fun resetNumber()
 }

@@ -1,13 +1,8 @@
 package com.example.week71
 
-import android.R.attr.src
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.drawable.BitmapDrawable
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,14 +10,12 @@ import android.widget.BaseAdapter
 import android.widget.ImageView
 import android.widget.TextView
 import coil.load
-import java.io.*
-import java.net.HttpURLConnection
-import java.net.URL
 
 
-//адаптер для списка героев
-@SuppressLint("SdCardPath")
-val PATH_ICON = "/data/data/com.example.week71/images/icons/"
+/**
+ * адаптер для списка героев
+ *
+ */
 
 class HeroAdapter(private var activity: Activity, private var listview: List<HeroData>?) :
     BaseAdapter() {

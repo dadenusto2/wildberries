@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">week8.3</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="githubLink"><a href="https://github.com/dadenusto2/wildberries">Github с проектами стажировки в Wildberries</a></string>
+
+</resources>

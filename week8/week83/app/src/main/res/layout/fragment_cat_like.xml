@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:background="#FFF0C4"
+    tools:context=".FragmentCatLike">
+
+    <Button
+        android:id="@+id/btn_favorite"
+        android:layout_width="wrap_content"
+        android:layout_height="0dp"
+        android:layout_marginStart="10dp"
+        android:layout_marginEnd="10dp"
+        android:background="@drawable/button_favorite"
+        android:text="Избраное"
+        app:layout_constraintBottom_toBottomOf="@+id/ib_like"
+        app:layout_constraintEnd_toStartOf="@+id/ib_like"
+        app:layout_constraintHorizontal_bias="0.27"
+        app:layout_constraintStart_toEndOf="@+id/ib_dislike"
+        app:layout_constraintTop_toTopOf="@+id/ib_like" />
+
+    <com.facebook.drawee.view.SimpleDraweeView
+        android:id="@+id/iv_favorite"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/ic_baseline_refresh_24"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toTopOf="@+id/ib_like"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/et_username"
+        app:layout_constraintVertical_bias="0.0" />
+
+    <ImageButton
+        android:id="@+id/ib_like"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:layout_marginTop="20dp"
+        android:layout_marginBottom="20dp"
+        android:background="@drawable/round"
+        android:contentDescription="@string/app_name"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/btn_favorite"
+        app:layout_constraintTop_toBottomOf="@+id/iv_favorite"
+        app:srcCompat="@drawable/ic_baseline_thumb_up_24"
+        tools:ignore="SpeakableTextPresentCheck" />
+
+    <ImageButton
+        android:id="@+id/ib_dislike"
+        android:layout_width="60dp"
+        android:layout_height="60dp"
+        android:background="@drawable/button_dislike"
+        android:contentDescription="@string/app_name"
+        app:layout_constraintBottom_toBottomOf="@+id/ib_like"
+        app:layout_constraintEnd_toStartOf="@+id/btn_favorite"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/ib_like"
+        app:layout_constraintVertical_bias="0.5"
+        app:srcCompat="@drawable/ic_baseline_thumb_down_24" />
+
+    <EditText
+        android:id="@+id/et_username"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="10dp"
+        android:layout_marginEnd="20dp"
+        android:ems="10"
+        android:gravity="center"
+        android:hint="0"
+        android:inputType="textPersonName"
+        android:minHeight="48dp"
+        android:text="0"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toTopOf="@+id/iv_favorite"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/textView2"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <TextView
+        android:id="@+id/textView2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:text="Имя пользователя"
+        android:textColor="#000000"
+        app:layout_constraintBottom_toBottomOf="@+id/et_username"
+        app:layout_constraintEnd_toStartOf="@+id/et_username"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="@+id/et_username" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

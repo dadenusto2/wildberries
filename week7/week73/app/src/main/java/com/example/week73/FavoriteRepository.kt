@@ -3,7 +3,10 @@ package com.example.week73
 import android.util.Log
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
-import androidx.room.*
+import com.example.week73.DB.MyDatabase
+import com.example.week73.model.CatDataItem
+import com.example.week73.model.FavoriteData
+import com.example.week73.model.FavoritesUrl
 import io.ktor.client.*
 import io.ktor.client.engine.android.*
 import io.ktor.client.request.*
@@ -15,7 +18,9 @@ import kotlinx.coroutines.launch
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 
-
+/**
+ * Класс репозитория
+ */
 @DelicateCoroutinesApi
 class FavoriteRepository {
     /**
@@ -85,38 +90,52 @@ class FavoriteRepository {
 
         val job: Job
         // если список бд не нулевой и совпадет со список API
-        if (favoriteCatsFromDB.size > 1 && isEqual(favoriteCatsFromDB, favoriteCatsFromApi)) {
+        if (favoriteCatsFromDB.size > 0 && (isEqual(
+                favoriteCatsFromDB,
+                favoriteCatsFromApi
+            ) || favoriteCatsFromApi.size == 0)
+        ) {
             job = GlobalScope.launch {
                 //Берем ссылки из БД
                 Log.d("---DB", "Данные из DB!")
                 favoriteCats = favoriteCatsFromDB
                 context.lifecycleScope.launch {
-                    Toast.makeText(context, "Данные из DB!", Toast.LENGTH_LONG)
-                        .show()
+                    if (favoriteCatsFromApi.size == 0)
+                        Toast.makeText(
+                            context,
+                            "Данные из DB!\nОбновить не удалось",
+                            Toast.LENGTH_LONG
+                        ).show()
+                    else
+                        Toast.makeText(
+                            context,
+                            "Данные из DB!\nОбновление не требуется",
+                            Toast.LENGTH_LONG
+                        ).show()
+
                 }
             }
-        //иначе список из API
-        } else if (favoriteCatsFromApi.size > 1) {
+            //иначе список из API
+        } else if (favoriteCatsFromApi.size > 0) {
             job = GlobalScope.launch {
                 Log.d("---DB", "Данные из API!")
                 favoriteCats = favoriteCatsFromApi
                 //обновляем список бд
                 updateFavoriteCats(curUser, myDatabase, context)
                 context.lifecycleScope.launch {
-                    Toast.makeText(context, "Данные из API!", Toast.LENGTH_LONG)
+                    Toast.makeText(context, "Данные из API!\nDB обновленна", Toast.LENGTH_LONG)
                         .show()
                 }
             }
-        //если нетсписка в бд и из API
+            //если нетсписка в бд и из API
         } else {
-            job = GlobalScope.launch {
+            job =
                 context.lifecycleScope.launch {
                     Toast.makeText(context, "Ошибка! Нет подходящих данных", Toast.LENGTH_LONG)
                         .show()
                 }
-            }
-        }
 
+        }
         job.start()
         job.join()
         return favoriteCats
@@ -129,23 +148,31 @@ class FavoriteRepository {
      *
      * @return ссылки из API
      */
-    private suspend fun getFavoriteFromApi(curUser: String): MutableList<FavoritesUrl?> {
-        //создаем запрос на все оценки у данного пользователя
-        val clientPost = HttpClient(Android) {}
-        val get = clientPost.get<String> {
-            header("x-api-key", API_KEY)
-            parameter("sub_id", curUser)
-            url {
-                protocol = URLProtocol.HTTPS
-                host = "api.thecatapi.com"
-                path(VOTES_URL)
+    private suspend fun getFavoriteFromApi(
+        curUser: String
+    ): MutableList<FavoritesUrl?> {
+
+        try {
+            //создаем запрос на все оценки у данного пользователя
+            val clientPost = HttpClient(Android) {}
+            val get = clientPost.get<String> {
+                header("x-api-key", API_KEY)
+                parameter("sub_id", curUser)
+                url {
+                    protocol = URLProtocol.HTTPS
+                    host = "api.thecatapi.com"
+                    path(VOTES_URL)
+                }
             }
+            // Получаем ID лайкнутых котов(без фото) - объхект типа FavoriteData
+            val favoriteCatsFromApi = Json.decodeFromString<MutableList<FavoriteData>>(get)
+            // возвращаем ссылки на лайкнутых котоы
+            return getImages(favoriteCatsFromApi)
+        } catch (e: Exception) {
+            return mutableListOf()
         }
-        // Получаем ID лайкнутых котов(без фото) - объхект типа FavoriteData
-        val favoriteCatsFromApi = Json.decodeFromString<MutableList<FavoriteData>>(get)
-        // возвращаем ссылки на лайкнутых котоы
-        return getImages(favoriteCatsFromApi)
     }
+
 
     /**
      * Получаем сслыки из БД
@@ -159,7 +186,7 @@ class FavoriteRepository {
         curUser: String,
         myDatabase: MyDatabase
     ): MutableList<FavoritesUrl?> {
-        return myDatabase.userDao().getFavorites(curUser)
+        return myDatabase.favoritesDao().getFavorites(curUser)
     }
 
     /**
@@ -170,10 +197,9 @@ class FavoriteRepository {
      * @return ссылки из API
      */
     private suspend fun getImages(favoriteImages: MutableList<FavoriteData>): MutableList<FavoritesUrl?> {
-        // Хранение ссылок на объекты котов, котьорые были пролайканы
         val imageUrls = mutableListOf<String>()
         val subId = favoriteImages[0].sub_id
-        for (element in favoriteImages) {//получаем ссылка на фото с оценокой 1(лайк)
+        for (element in favoriteImages) {//получаем ссылки на фото с оценокой 1(лайк)
             if (element.value == 1) {
                 imageUrls.add(
                     "https://api.thecatapi.com/v1/images/" +
@@ -232,45 +258,10 @@ class FavoriteRepository {
      */
     private fun updateDB(favoriteCatsFromApi: MutableList<FavoritesUrl?>, myDatabase: MyDatabase) {
         // очищаем бД
-        myDatabase.userDao().deleteAll()
+        myDatabase.favoritesDao().deleteAll()
         // всавлем элементы из API
         for (favoriteCat in favoriteCatsFromApi) {
-            myDatabase.userDao().insertUser(favoriteCat)
+            myDatabase.favoritesDao().insertFavorite(favoriteCat)
         }
-    }
-
-    /**
-     * интефейс для запросв к БД
-     */
-    @Dao
-    interface UserDao {
-        /**
-         * выборка по текущему subId
-         */
-        @Query("SELECT * FROM FavoritesUrl where subId = :sub_id")
-        fun getFavorites(sub_id: String): MutableList<FavoritesUrl?>
-
-        /**
-         * выборка всех элементов
-         */
-        @Query("SELECT * FROM FavoritesUrl ")
-        fun getAll(): MutableList<FavoritesUrl?>
-
-        /**
-         * вставка
-         */
-        @Insert(onConflict = OnConflictStrategy.REPLACE)
-        fun insertUser(favoritesUrl: FavoritesUrl?): Long?
-
-        /**
-         * удалить все элементы из табицы
-         */
-        @Delete
-        fun deleteUser(favoritesUrl: FavoritesUrl?)
-        /**
-         * удалить конкретный элемент из табицы
-         */
-        @Query("DELETE FROM FavoritesUrl")
-        fun deleteAll()
     }
 }

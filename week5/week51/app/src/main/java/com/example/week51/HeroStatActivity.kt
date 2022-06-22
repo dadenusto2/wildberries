@@ -5,15 +5,19 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.ViewGroup
-import android.widget.*
+import android.widget.ImageView
+import android.widget.LinearLayout
+import android.widget.TextView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
 import coil.load
 import kotlin.reflect.full.memberProperties
 
 class HeroStatActivity : AppCompatActivity() {
-    lateinit var ivImg : ImageView
-    private lateinit var swipeRefreshLayout : SwipeRefreshLayout
+    lateinit var ivImg: ImageView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
     @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,9 +40,9 @@ class HeroStatActivity : AppCompatActivity() {
         tvName.text = heroData.localizedName
         layout.addView(heroName)
 
-        val heroProps = HeroData::class.memberProperties.sortedBy { !it.isLateinit}
+        val heroProps = HeroData::class.memberProperties.sortedBy { !it.isLateinit }
         for (curProp in heroProps) {
-            if(curProp.name!="img" && curProp.name!="icon" && curProp.name!="localizedName") {
+            if (curProp.name != "img" && curProp.name != "icon" && curProp.name != "localizedName") {
                 val statItem = layoutInflater.inflate(R.layout.hero_stat_item, null) as ViewGroup
                 val tvFieldName = statItem.findViewById<TextView>(R.id.tv_stat_name)
                 val tvValue = statItem.findViewById<TextView>(R.id.tv_stat_value)
@@ -50,7 +54,7 @@ class HeroStatActivity : AppCompatActivity() {
                 )
                 tvFieldName.text = resources.getString(resString)
                 //задаем значение
-                if(curProp.get(heroData).toString() == "null")
+                if (curProp.get(heroData).toString() == "null")
                     tvValue.text = "Отсутсвует"
                 else
                     tvValue.text = curProp.get(heroData).toString()
@@ -62,18 +66,17 @@ class HeroStatActivity : AppCompatActivity() {
         swipeRefreshLayout.setOnRefreshListener {
             loadImg(heroImgURL)
         }
-        /*val adapter = StatAdapter(heroData, this@HeroStatActivity, heroesStats)
-        mHandler = Handler(Looper.getMainLooper());
-        mHandler.post {
-            listView.adapter = adapter
-            adapter.notifyDataSetChanged()
-        }*/
-
     }
-    fun loadImg(heroImgURL: String){
+
+    /**
+     * Загрузка избражения
+     *
+     * @param heroImgURL - сслыка для загрузки
+     */
+    fun loadImg(heroImgURL: String) {
         val mHandler: Handler = Handler(Looper.getMainLooper())
         mHandler.post {
-            ivImg.load(BASE_URL+ heroImgURL)
+            ivImg.load(BASE_URL + heroImgURL)
             {
                 listener(
                     onError = { _, _ ->

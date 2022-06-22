@@ -11,8 +11,11 @@ import android.widget.ImageView
 import android.widget.TextView
 import coil.load
 
-//адаптер для списка героев
-class HeroAdapter(private var activity: Activity, private var listview: List<HeroData>?) : BaseAdapter() {
+/**
+ * Адаптер для списка героев
+ */
+class HeroAdapter(private var activity: Activity, private var listview: List<HeroData>?) :
+    BaseAdapter() {
     override fun getCount(): Int {
         return listview!!.size
     }
@@ -28,9 +31,10 @@ class HeroAdapter(private var activity: Activity, private var listview: List<Her
     private class ViewHolder(row: View?) {
         var tvName: TextView? = null
         var ivIcon: ImageView? = null
+
         init {
             this.tvName = row?.findViewById(R.id.tv_name)
-            this.ivIcon =row?.findViewById(R.id.iv_icon)
+            this.ivIcon = row?.findViewById(R.id.iv_icon)
         }
     }
 
@@ -39,7 +43,8 @@ class HeroAdapter(private var activity: Activity, private var listview: List<Her
         val view: View?
         val viewHolder: ViewHolder
         if (p1 == null) {
-            val inflater = activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
+            val inflater =
+                activity.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
             view = inflater.inflate(R.layout.hero_item, null)
             viewHolder = ViewHolder(view)
             view?.tag = viewHolder
@@ -50,7 +55,7 @@ class HeroAdapter(private var activity: Activity, private var listview: List<Her
         val heroData = listview?.get(p0)
 
         viewHolder.tvName?.text = heroData!!.localizedName
-        viewHolder.ivIcon?.load(BASE_URL+ heroData.icon)//загружаем иконку
+        viewHolder.ivIcon?.load(BASE_URL + heroData.icon)//загружаем иконку
 
         return view as View
     }

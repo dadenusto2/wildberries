@@ -8,13 +8,10 @@ import android.widget.LinearLayout
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.week72.Model.HeroData
+import com.example.week72.model.HeroData
 import com.squareup.picasso.Picasso
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
-
-@SuppressLint("SdCardPath")
-const val PATH_IMAGE = "/data/data/com.example.week72/images/images/"
 
 class HeroStatActivity : AppCompatActivity() {
     lateinit var ivImg: ImageView
@@ -79,7 +76,11 @@ class HeroStatActivity : AppCompatActivity() {
         }
     }
 
-    //загрузка изображения через picasso
+    /**
+     * Загрузка изображения через picasso
+     *
+     * @param heroData - данные героя для загрузки
+     */
     fun loadImg(heroData: HeroData) {
         Picasso.with(this)
             .load(heroData.images.lg)

@@ -11,7 +11,7 @@ import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import com.example.week72.Model.HeroData
+import com.example.week72.model.HeroData
 import kotlinx.coroutines.DelicateCoroutinesApi
 import kotlinx.coroutines.GlobalScope
 import kotlinx.coroutines.Job
@@ -44,7 +44,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Создаем меню
+     * Создание меню
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
@@ -75,7 +75,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Делаем запром на создание списка из Shared Preferences или API
+     * Запрос на создание списка из Shared Preferences или API
      */
     private suspend fun getResponse() {
         var heroesList: List<HeroData>? = mutableListOf()
@@ -89,9 +89,9 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Задаем отображения
+     * Отображение списка
      *
-     * @param heroesList - список для отображения
+     * @param heroesList - список
      */
     fun setList(heroesList: List<HeroData>?) {
         val listView: ListView? = findViewById(R.id.lv_heroes)

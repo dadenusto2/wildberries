@@ -9,7 +9,7 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/fragment_pi"
-        class="com.example.week62.FragmentPiCount"
+        class="com.example.week62.FragmentNumberGenerate"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_weight="1" />

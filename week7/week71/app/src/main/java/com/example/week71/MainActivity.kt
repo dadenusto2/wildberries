@@ -12,9 +12,12 @@ import android.widget.ListView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.lifecycleScope
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import kotlinx.coroutines.*
-import okhttp3.*
-import java.io.*
+import kotlinx.coroutines.DelicateCoroutinesApi
+import kotlinx.coroutines.GlobalScope
+import kotlinx.coroutines.launch
+import okhttp3.OkHttpClient
+import okhttp3.Request
+import java.io.Serializable
 
 const val BASE_URL = "https://api.opendota.com"
 const val HERO_STATS = "/api/heroStats"
@@ -41,7 +44,7 @@ class MainActivity : AppCompatActivity() {
             .build()
         heroesRepository = HeroesRepository(this)
         GlobalScope.launch {
-            heroesRepository.updateHeroesList()
+            heroesRepository.updateHeroesList(false)
         }
 
         swipeRefreshLayout = findViewById(R.id.sfl_heroes)
@@ -57,7 +60,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     /**
-     * Делаем запром на создание списка и фала или API
+     * Запром на создание списка из файла или API
      */
     private suspend fun getResponse() {
         var heroes: List<HeroData>? = mutableListOf()
@@ -85,25 +88,27 @@ class MainActivity : AppCompatActivity() {
                 }
             adapter.notifyDataSetChanged()
         }
+        swipeRefreshLayout.isRefreshing = false
     }
 
     /**
-     * Создаем меню
+     * Создание меню
      */
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         val inflater = menuInflater
-        inflater.inflate(R.menu.main_menu, menu)
+        inflater.inflate(R. /**
+         * Выбор пункта меню
+         */menu.main_menu, menu)
         return super.onCreateOptionsMenu(menu)
     }
 
-    /**
-     * Выбор пункта меню
-     */
+
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when (item.itemId) {
             R.id.action_update -> {
                 GlobalScope.launch {//обновляем
-                    heroesRepository.updateHeroesList()
+                    if(heroesRepository.updateHeroesList(true))
+                        getResponse()
                 }
                 return true
             }

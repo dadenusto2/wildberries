@@ -1,21 +1,33 @@
 package com.example.week63
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import androidx.appcompat.app.AppCompatActivity
 
+/**
+ * Основная активность, насследует интерфес для взаимодейсвия между фрагментами
+ */
 class MainActivity : AppCompatActivity(), OnFragmentSendDataListener {
-    lateinit var piFragment: FragmentPiCount
+    private lateinit var fragmentNumberGenerate: FragmentNumberGenerate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
-        piFragment = supportFragmentManager.findFragmentById(R.id.fragment_pi) as FragmentPiCount
+        fragmentNumberGenerate =
+            supportFragmentManager.findFragmentById(R.id.fragment_pi) as FragmentNumberGenerate
     }
 
-    override fun changeGenerateStatus():Boolean{
-        return piFragment.changeGenerateStatus()
+    /**
+     * Изменеие статуса генерации
+     *
+     * @return новый статус
+     */
+    override fun changeGenerateStatus(): Boolean {
+        return fragmentNumberGenerate.changeGenerateStatus()
     }
 
-    override fun resetNumber(){
-        piFragment.resetNumber()
+    /**
+     * Сброс числа
+     */
+    override fun resetNumber() {
+        fragmentNumberGenerate.resetNumber()
     }
 }

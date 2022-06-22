@@ -1,0 +1,28 @@
+<resources>
+    <string name="app_name">week8.2</string>
+    <string name="gender">пол</string>
+    <string name="race">раса</string>
+    <string name="height">рост</string>
+    <string name="weight">вес</string>
+    <string name="eyeColor">цвет глаз</string>
+    <string name="hairColor">цвет волос</string>
+    <string name="fullName">полное имя</string>
+    <string name="aliases">псевдонимы</string>
+    <string name="placeOfBirth">место рождения</string>
+    <string name="firstAppearance">первое появление</string>
+    <string name="publisher">издатель</string>
+    <string name="groupAffiliation">группы</string>
+    <string name="relatives">отношения</string>
+    <string name="intelligence">интелект</string>
+    <string name="strength">сила</string>
+    <string name="speed">скорость</string>
+    <string name="durability">выносливость</string>
+    <string name="power">сила</string>
+    <string name="combat">боевые навыки</string>
+    <string name="occupation">род занятий</string>
+    <string name="base">база</string>
+    <string name="alignment">позиция</string>
+    <string name="alterEgos">альтер эго</string>
+    <string name="githubLink"><a href="https://github.com/dadenusto2/wildberries">Github с проектами стажировки в Wildberries</a></string>
+
+</resources>

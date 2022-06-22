@@ -1,27 +1,33 @@
 package com.example.week53
 
 import android.net.Uri
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.week53.model.FavoritesUrl
 import com.facebook.drawee.view.SimpleDraweeView
 
-class ImageGalleryAdapter (val imageData: MutableList<String?>)
-    : RecyclerView.Adapter<ImageGalleryAdapter.MyViewHolder>() {
+/**
+ * Адаптер для галлереи
+ */
+class ImageGalleryAdapter(val imageData: MutableList<FavoritesUrl?>) :
+    RecyclerView.Adapter<ImageGalleryAdapter.MyViewHolder>() {
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ImageGalleryAdapter.MyViewHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): MyViewHolder {
         val context = parent.context
         val inflater = LayoutInflater.from(context)
         val photoView = inflater.inflate(R.layout.favorite_item, parent, false)
         return MyViewHolder(photoView)
     }
 
-    override fun onBindViewHolder(holder: ImageGalleryAdapter.MyViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
         val imageView = holder.draweeView
         val uri: Uri =
-            Uri.parse(imageData[position])
+            Uri.parse(imageData[position]?.url)
+        Log.d("---", imageData[position]?.url.toString())
         imageView.setImageURI(uri)
     }
 

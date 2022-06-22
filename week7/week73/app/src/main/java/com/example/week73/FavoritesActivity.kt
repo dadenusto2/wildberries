@@ -2,9 +2,7 @@ package com.example.week73
 
 import android.annotation.SuppressLint
 import android.app.AlertDialog
-import android.content.Context
 import android.graphics.Color
-import android.net.ConnectivityManager
 import android.os.Bundle
 import android.os.Handler
 import android.os.Message
@@ -13,13 +11,13 @@ import android.view.ViewGroup
 import android.widget.LinearLayout
 import android.widget.ProgressBar
 import android.widget.TextView
-import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
-import androidx.core.view.isEmpty
 import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.room.Room
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import com.example.week73.DB.MyDatabase
+import com.example.week73.model.FavoritesUrl
 import kotlinx.coroutines.*
 
 const val VOTES_URL = "v1/votes"
@@ -28,11 +26,11 @@ const val VOTES_URL = "v1/votes"
 class FavoritesActivity : AppCompatActivity() {
     private lateinit var recyclerView: RecyclerView
     private lateinit var imageGalleryAdapter: ImageGalleryAdapter
-    lateinit var swipeRefreshLayout: SwipeRefreshLayout
-    lateinit var curUser: String
-    private lateinit var myDatabase: MyDatabase
-    lateinit var favoriteRepository: FavoriteRepository
-    lateinit var mHandler: Handler
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+    private lateinit var curUser: String //текущий пользователь
+    private lateinit var myDatabase: MyDatabase //бд
+    private lateinit var favoriteRepository: FavoriteRepository //репозиторий
+    private lateinit var mHandler: Handler
     var isShowing: Boolean = false
 
     @SuppressLint("HandlerLeak")
@@ -54,7 +52,7 @@ class FavoritesActivity : AppCompatActivity() {
 
         swipeRefreshLayout = findViewById(R.id.sfl_favorite_cats)
 
-        //счоздаем БД
+        //создаем БД
         myDatabase = Room.databaseBuilder(
             this,
             MyDatabase::class.java, MyDatabase.NAME
@@ -77,7 +75,8 @@ class FavoritesActivity : AppCompatActivity() {
                     0 -> {//не показывать
                         try {
                             loading!!.dismiss()
-                        } catch (e: Exception) { }
+                        } catch (e: Exception) {
+                        }
                     }
                 }
             }
@@ -86,7 +85,7 @@ class FavoritesActivity : AppCompatActivity() {
             getFavoriteCats()
         }
 
-        //плучаем котов
+        //получаем котов
         getFavoriteCats()
     }
 
@@ -94,44 +93,32 @@ class FavoritesActivity : AppCompatActivity() {
      *  Получаем ссылки на фото лайкнутых котов
      */
     @SuppressLint("HandlerLeak")
-    private fun getFavoriteCats() {
-        val connectivity =
-            applicationContext.getSystemService(Context.CONNECTIVITY_SERVICE)
-                    as ConnectivityManager
-        val info = connectivity.activeNetwork
-        //проверяем соединение
-        if (info != null) {
-            if (recyclerView.isEmpty()) {//если пустое
-                if (!isShowing) {
-                    isShowing = true
-                    mHandler.sendEmptyMessage(1)
-                }
-                //задаем окно загрузки
-                var images = mutableListOf<FavoritesUrl?>()
-                val job: Job = GlobalScope.launch(Dispatchers.IO) {
-                    val favoriteRepository = FavoriteRepository()
-                    // получаем ссылки на картинки лайкнутых котов
-                    images = favoriteRepository.getFavoriteCats(
-                        curUser,
-                        myDatabase,
-                        this@FavoritesActivity
-                    )
-                }
-                GlobalScope.launch {
-                    job.start()
-                    job.join()
-                    mHandler.post {
-                        //задаем адаптер
-                        imageGalleryAdapter = ImageGalleryAdapter(images)
-                        recyclerView.adapter = imageGalleryAdapter
-                        mHandler.sendEmptyMessage(0)
-                        isShowing = false
-                    }
-                }
-            }
-        } else {
+    private fun getFavoriteCats() {//если пустое
+        if (!isShowing) {
+            isShowing = true
+            mHandler.sendEmptyMessage(1)
+        }
+        //задаем окно загрузки
+        var images = mutableListOf<FavoritesUrl?>()
+        val job: Job = GlobalScope.launch(Dispatchers.IO) {
+            val favoriteRepository = FavoriteRepository()
+            // получаем ссылки на картинки лайкнутых котов
+            images = favoriteRepository.getFavoriteCats(
+                curUser,
+                myDatabase,
+                this@FavoritesActivity
+            )
+        }
+        GlobalScope.launch {
+            // получаем котов
+            job.start()
+            job.join()
+            //задаем адаптер
             mHandler.post {
-                Toast.makeText(this, "Нет соединения!", Toast.LENGTH_LONG).show()
+                imageGalleryAdapter = ImageGalleryAdapter(images)
+                recyclerView.adapter = imageGalleryAdapter
+                mHandler.sendEmptyMessage(0)
+                isShowing = false
             }
         }
         swipeRefreshLayout.isRefreshing = false

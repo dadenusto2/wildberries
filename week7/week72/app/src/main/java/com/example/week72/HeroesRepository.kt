@@ -5,7 +5,8 @@ import android.content.Context.MODE_PRIVATE
 import android.content.SharedPreferences
 import android.widget.Toast
 import androidx.lifecycle.lifecycleScope
-import com.example.week72.Model.HeroData
+import com.example.week72.model.HeroData
+import com.example.week72.model.RetrofitService
 import com.google.gson.GsonBuilder
 import com.google.gson.reflect.TypeToken
 import kotlinx.coroutines.DelicateCoroutinesApi
@@ -15,8 +16,6 @@ import kotlinx.coroutines.launch
 import retrofit2.Call
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
-import retrofit2.http.GET
-import java.io.File
 import java.io.Serializable
 
 /**
@@ -76,7 +75,7 @@ class HeroesRepository(private val context: MainActivity) : Serializable {
             null
         )
         val myType = object : TypeToken<List<HeroData>>() {}.type
-         //возвращаем список героев из Shared Preferences
+        //возвращаем список героев из Shared Preferences
         return gson.fromJson(heroFromPref, myType)
     }
 
@@ -116,7 +115,7 @@ class HeroesRepository(private val context: MainActivity) : Serializable {
     }
 
     /**
-     * Обновлем список героев в Shared Preferences
+     * Обновление списка героев в Shared Preferences
      */
     fun updateHeroesList() {
         //Список из Shared Preferences
@@ -162,7 +161,7 @@ class HeroesRepository(private val context: MainActivity) : Serializable {
     }
 
     /**
-     * Записываем данные в Shared Preferences
+     * Запись данных в Shared Preferences
      *
      * @param heroesList - список для обновления
      */
@@ -181,22 +180,14 @@ class HeroesRepository(private val context: MainActivity) : Serializable {
     }
 
     /**
-     * Удаляем Shared Preferences
+     * Удаление Shared Preferences
      */
     fun deleteFile() {
         val mPrefs: SharedPreferences = context.getPreferences(MODE_PRIVATE)
         val prefsEditor: SharedPreferences.Editor = mPrefs.edit()
         prefsEditor.clear()
         prefsEditor.apply()
-        context.lifecycleScope.launch() {
-            Toast.makeText(context, "Shared Preferences удален!", Toast.LENGTH_LONG)
-                .show()
-        }
-    }
-
-    interface RetrofitService {
-        //интерфейс для
-        @get:GET("all.json")
-        val heroesData: Call<List<HeroData>>
+        Toast.makeText(context, "Shared Preferences удален!", Toast.LENGTH_LONG)
+            .show()
     }
 }

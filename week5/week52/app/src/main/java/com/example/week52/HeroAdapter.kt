@@ -11,7 +11,9 @@ import android.widget.TextView
 import com.example.week52.Model.HeroData
 import com.squareup.picasso.Picasso
 
-//адаптер списка героев
+/**
+ * Адаптер списка героев
+ */
 class HeroAdapter(private var activity: Activity, private var heroesList: List<HeroData>?) : BaseAdapter() {
     override fun getCount(): Int {
         return heroesList!!.size

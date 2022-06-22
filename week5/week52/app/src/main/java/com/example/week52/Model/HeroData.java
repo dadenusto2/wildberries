@@ -5,7 +5,9 @@ import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
-//класс для данных о герое
+/**
+ * Класс для данных о герое
+ */
 public class HeroData implements Serializable {
     @SerializedName("id")
     @Expose

@@ -4,7 +4,9 @@ import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
 import java.io.Serializable
 
-//класс для данных героя
+/**
+ * Класс для данных героя
+ */
 @JsonClass(generateAdapter = true)
 class HeroData: Serializable {
     @Json(name = "localized_name")

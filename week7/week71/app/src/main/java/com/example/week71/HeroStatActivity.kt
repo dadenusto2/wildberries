@@ -19,9 +19,9 @@ import java.net.HttpURLConnection
 import java.net.URL
 import kotlin.reflect.full.memberProperties
 
-@SuppressLint("SdCardPath")
-val PATH_IMAGE = "/data/data/com.example.week71/images/images/"
-
+/**
+ * Активность с характеристиками конкретного героя
+ */
 class HeroStatActivity : AppCompatActivity() {
     lateinit var ivImg: ImageView
     private lateinit var swipeRefreshLayout: SwipeRefreshLayout

@@ -2,7 +2,6 @@ package com.example.week52
 
 import android.annotation.SuppressLint
 import android.os.Bundle
-import android.util.Log
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.LinearLayout
@@ -14,9 +13,10 @@ import com.squareup.picasso.Picasso
 import kotlin.reflect.full.memberProperties
 import kotlin.reflect.jvm.isAccessible
 
-class HeroStatActivity: AppCompatActivity()  {
-    lateinit var ivImg : ImageView
-    private lateinit var swipeRefreshLayout : SwipeRefreshLayout
+class HeroStatActivity : AppCompatActivity() {
+    lateinit var ivImg: ImageView
+    private lateinit var swipeRefreshLayout: SwipeRefreshLayout
+
     @SuppressLint("InflateParams")
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,8 +74,13 @@ class HeroStatActivity: AppCompatActivity()  {
             loadImg(heroData)
         }
     }
-    //загрузка изображения через picasso
-    fun loadImg(heroData: HeroData){
+
+    /**
+     * Загрузка изображения через picasso
+     *
+     * @param heroData - данные героя для загрузки
+     */
+    fun loadImg(heroData: HeroData) {
         Picasso.with(this)
             .load(heroData.images.lg)
             .into(ivImg)

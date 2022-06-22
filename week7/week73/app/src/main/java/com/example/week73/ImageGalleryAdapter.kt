@@ -7,8 +7,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import androidx.recyclerview.widget.RecyclerView
+import com.example.week73.model.FavoritesUrl
 import com.facebook.drawee.view.SimpleDraweeView
-import java.io.IOException
 
 class ImageGalleryAdapter (val imageData: MutableList<FavoritesUrl?>)
     : RecyclerView.Adapter<ImageGalleryAdapter.MyViewHolder>() {

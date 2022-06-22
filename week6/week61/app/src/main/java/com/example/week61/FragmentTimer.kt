@@ -1,10 +1,11 @@
 package com.example.week61
 
 import android.annotation.SuppressLint
-import android.content.Context
 import android.graphics.Color
-import android.os.*
-import android.util.Log
+import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.os.SystemClock
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,11 +14,13 @@ import android.widget.ImageButton
 import androidx.fragment.app.Fragment
 import java.util.*
 
-// фрагмент таймера, остановки/запуска и сброса
+/**
+ * фрагмент таймера, остановки/запуска и сброса
+ */
 class FragmentTimer : Fragment() {
     private var fragmentSendDataListener: OnFragmentSendDataListener? = null
     lateinit var chronometer: Chronometer//для вывода времени рабрты
-    lateinit var ibPlay : ImageButton
+    lateinit var ibPlay: ImageButton
     override fun onCreateView(
         inflater: LayoutInflater,
         container: ViewGroup?,
@@ -36,14 +39,14 @@ class FragmentTimer : Fragment() {
             //время в милисекундах
             val elapsedMillis: Long = (SystemClock.elapsedRealtime() - chronometer.base)
             //если делится на 20 и не нулевая секунда
-            if ((elapsedMillis/1000 % 20).toDouble() == 0.0 && elapsedMillis>1000) {
+            if ((elapsedMillis / 1000 % 20).toDouble() == 0.0 && elapsedMillis > 1000) {
                 Thread {
                     val rnd = Random()
                     // генерируем случайный цвет для фона
                     val red = rnd.nextInt(256)
                     val green = rnd.nextInt(256)
                     val blue = rnd.nextInt(256)
-                    val color = Color.argb(255,red, green, blue)
+                    val color = Color.argb(255, red, green, blue)
                     //какой цвет: темный или светлый
                     val light = (1 - (0.299 * red + 0.587 * green + 0.114 * blue) / 255 < 0.5)
                     mHandler.post {
@@ -52,7 +55,7 @@ class FragmentTimer : Fragment() {
                         else//если темный, текст времени белый
                             chronometer.setTextColor(Color.WHITE)
                         view.setBackgroundColor(color)//меняем цвет фона
-                }
+                    }
                 }.start()
             }
         }
@@ -63,7 +66,7 @@ class FragmentTimer : Fragment() {
         ibPlay.setOnClickListener {
             // меням состояние и возвращаем текущее
             val b = fragmentSendDataListener!!.changeGenerateStatus()
-            if(b)
+            if (b)
                 ibPlay.setImageResource(android.R.drawable.ic_media_pause)
             else
                 ibPlay.setImageResource(android.R.drawable.ic_media_play)
@@ -75,13 +78,9 @@ class FragmentTimer : Fragment() {
             fragmentSendDataListener!!.resetNumber();
         }
     }
+
     override fun onPause() {
         ibPlay.setImageResource(android.R.drawable.ic_media_play)
         super.onPause()
     }
-}
-//интерфес для остановки/ запуска и сброса
-interface OnFragmentSendDataListener {
-    fun changeGenerateStatus():Boolean
-    fun resetNumber()
 }

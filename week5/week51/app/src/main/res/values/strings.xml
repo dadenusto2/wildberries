@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">week51</string>
+    <string name="app_name">week5.1</string>
     <string name="localizedName">Имя</string>
     <string name="baseHealth">Базовое здоровье</string>
     <string name="baseHealthRegen">Базовая регенерация здоровья</string>

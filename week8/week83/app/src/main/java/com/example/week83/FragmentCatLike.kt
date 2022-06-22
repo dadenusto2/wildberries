@@ -163,15 +163,18 @@ class FragmentCatLike : Fragment() {
                     draweeView.setImageURI(uri)
                     draweeView.isClickable = false
                 } catch (e: Exception) {
-                    Toast.makeText(context, "Нет соединения!", Toast.LENGTH_SHORT)
-                    .show()
+                    lifecycleScope.launch() {
+                        Toast.makeText(context, "Нет соединения!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
             }
         }
         else{
-            Toast.makeText(context, "Нет соединения!", Toast.LENGTH_SHORT)
-                .show()
-
+            lifecycleScope.launch() {
+                Toast.makeText(context, "Нет соединения!", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 }

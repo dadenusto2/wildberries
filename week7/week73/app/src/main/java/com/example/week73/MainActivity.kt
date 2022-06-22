@@ -12,6 +12,7 @@ import android.widget.EditText
 import android.widget.ImageButton
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.lifecycleScope
 import com.example.week73.model.CatDataItem
 import com.example.week73.model.VoteData
 import com.facebook.drawee.backends.pipeline.Fresco
@@ -107,8 +108,7 @@ class MainActivity : AppCompatActivity() {
      * @param vote - какая оценка 1-лайк, 0-диздайк, -1-ничего
      */
     private fun setCatImage(vote: Int) {
-        val connectivity =
-            getSystemService(Context.CONNECTIVITY_SERVICE)
+        val connectivity = getSystemService(Context.CONNECTIVITY_SERVICE)
                     as ConnectivityManager
         val info = connectivity.activeNetwork
 
@@ -148,15 +148,18 @@ class MainActivity : AppCompatActivity() {
                     draweeView.setImageURI(uri)
                     draweeView.isClickable = false
                 } catch (e: Exception) {
-                    Toast.makeText(this@MainActivity, "Нет соединения!", Toast.LENGTH_SHORT)
-                        .show()
+                    lifecycleScope.launch() {
+                        Toast.makeText(this@MainActivity, "Нет соединения!", Toast.LENGTH_SHORT)
+                            .show()
+                    }
                 }
             }
         }
         else{
-            Toast.makeText(this, "Нет соединения!", Toast.LENGTH_SHORT)
-                .show()
-
+            lifecycleScope.launch() {
+                Toast.makeText(this@MainActivity, "Нет соединения!", Toast.LENGTH_SHORT)
+                    .show()
+            }
         }
     }
 }
